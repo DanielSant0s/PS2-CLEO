@@ -1,3 +1,6 @@
+
+//Opcodes 0-99 table, we'll try with some unused opcodes
+
 patch=0,EE,2064C6F0,extended,0035C830//                   jpt_1FAF40:     .word loc_1FAF48         # DATA XREF: CRunningScript__ProcessCommands_0To99+34↑o
 //                                                                       # jump table for switch statement
 patch=0,EE,2064C6F4,extended,0035C980 //                                  .word @@opcode_0001      # wait %1d%
@@ -60,8 +63,8 @@ patch=0,EE,2064C7D4,extended,0035D670 //                                  .word 
 patch=0,EE,2064C7D8,extended,0035D6B0 //                                  .word loc_1FBC80         # jumptable 001FAF40 case 58
 patch=0,EE,2064C7DC,extended,0035D6E8 //                                  .word loc_1FBCB8         # jumptable 001FAF40 case 59
 patch=0,EE,2064C7E0,extended,0035D720 //                                  .word loc_1FBCF0         # jumptable 001FAF40 case 60
-patch=0,EE,2064C7E4,extended,0035C838 //                                  .word def_1FAF40         # READ_MEMORY
-patch=0,EE,2064C7E8,extended,0035C86C //                                  .word def_1FAF40         # WRITE_MEMORY
+patch=0,EE,2064C7E4,extended,0035C838 //                                  .word read_memory        # READ_MEMORY
+patch=0,EE,2064C7E8,extended,0035C86C //                                  .word write_memory       # WRITE_MEMORY
 patch=0,EE,2064C7EC,extended,0035DE70 //                                  .word def_1FAF40         # jumptable 001FAF40 default case, cases 61-65,71-76,84-87
 patch=0,EE,2064C7F0,extended,0035DE70 //                                  .word def_1FAF40         # jumptable 001FAF40 default case, cases 61-65,71-76,84-87
 patch=0,EE,2064C7F4,extended,0035DE70 //                                  .word def_1FAF40         # jumptable 001FAF40 default case, cases 61-65,71-76,84-87
@@ -103,7 +106,7 @@ patch=0,EE,2064C880,extended,0035DE70
 
 patch=0,EE,205F91C0,extended,0035C7E8 //Hook call to ProcessCommands_0To99
 
-//0x3D will be our experimental opcode
+//3D and 3E will be our experimental opcodes
 
 //                              CRunningScript__ProcessCommands_0To99:   # DATA XREF: seg000:_opcodeHandlerTable↓o
 //
@@ -168,7 +171,7 @@ patch=0,EE,2035C868,extended,0000102D //                                  move  
 //                                                                       # DATA XREF: seg000:jpt_1FAF40↓o
 
 patch=0,EE,2035C86C,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
-patch=0,EE,2035C870,extended,24050002 //                                  li      $a1, 3           # Get parameters
+patch=0,EE,2035C870,extended,24050002 //                                  li      $a1, 2           # Get parameters
 patch=0,EE,2035C874,extended,00000000 //                                  nop
 patch=0,EE,2035C878,extended,00000000 //                                  nop
 patch=0,EE,2035C874,extended,00000000 //                                  nop
@@ -193,7 +196,7 @@ patch=0,EE,2035C8b8,extended,00000000    //    nop
 patch=0,EE,2035C8bc,extended,03C0E82D    //    move    $sp,$fp
 patch=0,EE,2035C8c0,extended,8FBE0004    //    lw      $fp,4($sp)
 patch=0,EE,2035C8c4,extended,27BD0008    //    addiu   $sp,$sp,8
-patch=0,EE,2035C8c8,extended,03e00008    //    j       $31
+patch=0,EE,2035C8c8,extended,03e00008    //    jr      $ra
 patch=0,EE,2035C8cc,extended,00000000    //    nop
 
 //                               # ---------------------------------------------------------------------------
