@@ -1,3 +1,4 @@
+
 //Opcodes 0-99 table, we'll try with some unused opcodes
 
 patch=0,EE,2064C6F0,extended,0035C830//                   jpt_1FAF40:     .word loc_1FAF48         # DATA XREF: CRunningScript__ProcessCommands_0To99+34↑o
@@ -64,7 +65,7 @@ patch=0,EE,2064C7DC,extended,0035DC68 //                                  .word 
 patch=0,EE,2064C7E0,extended,0035DCA0 //                                  .word loc_1FBCF0         # jumptable 001FAF40 case 60
 patch=0,EE,2064C7E4,extended,0035C838 //                                  .word read_memory        # READ_MEMORY
 patch=0,EE,2064C7E8,extended,0035C86C //                                  .word write_memory       # WRITE_MEMORY
-patch=0,EE,2064C7EC,extended,0035C890 //                                  .word debug_msg         # DEBUG_MSG
+patch=0,EE,2064C7EC,extended,0035C890 //                                  .word call_function      # CALL_FUNCTION
 patch=0,EE,2064C7F0,extended,0035E3F0 //                                  .word def_1FAF40         # jumptable 001FAF40 default case, cases 61-65,71-76,84-87
 patch=0,EE,2064C7F4,extended,0035E3F0 //                                  .word def_1FAF40         # jumptable 001FAF40 default case, cases 61-65,71-76,84-87
 patch=0,EE,2064C7F8,extended,0035DCD8 //                                  .word loc_1FBD28         # jumptable 001FAF40 case 66
@@ -178,7 +179,7 @@ patch=0,EE,2035C888,extended,100006DB //                                  b     
 patch=0,EE,2035C88C,extended,0000102D //                                  move    $v0, $zero
 
 //                               # ---------------------------------------------------------------------------
-//                              debug_msg:                           # CODE XREF: CRunningScript__ProcessCommands_0To99+40↑j
+//                              call_function:                           # CODE XREF: CRunningScript__ProcessCommands_0To99+40↑j
 //                                                                       # DATA XREF: seg000:jpt_1FAF40↓o
 
 
