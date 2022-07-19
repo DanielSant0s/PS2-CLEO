@@ -1,4 +1,3 @@
-
 //Opcodes 0-99 table, we'll try with some unused opcodes
 
 patch=0,EE,2064C6F0,extended,0035C830//                   jpt_1FAF40:     .word loc_1FAF48         # DATA XREF: CRunningScript__ProcessCommands_0To99+34↑o
@@ -63,21 +62,21 @@ patch=0,EE,2064C7D4,extended,0035DBF0 //                                  .word 
 patch=0,EE,2064C7D8,extended,0035DC30 //                                  .word loc_1FBC80         # jumptable 001FAF40 case 58
 patch=0,EE,2064C7DC,extended,0035DC68 //                                  .word loc_1FBCB8         # jumptable 001FAF40 case 59
 patch=0,EE,2064C7E0,extended,0035DCA0 //                                  .word loc_1FBCF0         # jumptable 001FAF40 case 60
-patch=0,EE,2064C7E4,extended,0035C838 //                                  .word read_memory        # READ_MEMORY
-patch=0,EE,2064C7E8,extended,0035C86C //                                  .word write_memory       # WRITE_MEMORY
-patch=0,EE,2064C7EC,extended,0035C890 //                                  .word call_function      # CALL_FUNCTION
-patch=0,EE,2064C7F0,extended,0035E3F0 //                                  .word def_1FAF40         # jumptable 001FAF40 default case, cases 61-65,71-76,84-87
+patch=0,EE,2064C7E4,extended,0035C838 //                                  .word read_memory
+patch=0,EE,2064C7E8,extended,0035C86C //                                  .word write_memory
+patch=0,EE,2064C7EC,extended,0035C890 //                                  .word call_function
+patch=0,EE,2064C7F0,extended,0035CA4C //                                  .word call_method
 patch=0,EE,2064C7F4,extended,0035E3F0 //                                  .word def_1FAF40         # jumptable 001FAF40 default case, cases 61-65,71-76,84-87
 patch=0,EE,2064C7F8,extended,0035DCD8 //                                  .word loc_1FBD28         # jumptable 001FAF40 case 66
 patch=0,EE,2064C7FC,extended,0035DD20 //                                  .word loc_1FBD70         # jumptable 001FAF40 case 67
 patch=0,EE,2064C800,extended,0035DD68 //                                  .word loc_1FBDB8         # jumptable 001FAF40 case 68
 patch=0,EE,2064C804,extended,0035DDA8 //                                  .word loc_1FBDF8         # jumptable 001FAF40 case 69
 patch=0,EE,2064C808,extended,0035DDE8 //                                  .word loc_1FBE38         # jumptable 001FAF40 case 70
-patch=0,EE,2064C80C,extended,0035E3F0 //                                  .word def_1FAF40         # jumptable 001FAF40 default case, cases 61-65,71-76,84-87
-patch=0,EE,2064C810,extended,0035E3F0 //                                  .word def_1FAF40         # jumptable 001FAF40 default case, cases 61-65,71-76,84-87
-patch=0,EE,2064C814,extended,0035E3F0 //                                  .word def_1FAF40         # jumptable 001FAF40 default case, cases 61-65,71-76,84-87
-patch=0,EE,2064C818,extended,0035E3F0 //                                  .word def_1FAF40         # jumptable 001FAF40 default case, cases 61-65,71-76,84-87
-patch=0,EE,2064C81C,extended,0035E3F0 //                                  .word def_1FAF40         # jumptable 001FAF40 default case, cases 61-65,71-76,84-87
+patch=0,EE,2064C80C,extended,0035CBD4 //                                  .word get_ped_struct
+patch=0,EE,2064C810,extended,0035CC20 //                                  .word get_vehicle_struct
+patch=0,EE,2064C814,extended,0035CC6C //                                  .word get_object_struct
+patch=0,EE,2064C818,extended,0035CCB8 //                                  .word get_this_script_struct
+patch=0,EE,2064C81C,extended,0035CCDC //                                  .word get_var_offset
 patch=0,EE,2064C820,extended,0035E3F0 //                                  .word def_1FAF40         # jumptable 001FAF40 default case, cases 61-65,71-76,84-87
 patch=0,EE,2064C824,extended,0035DE28 //                                  .word loc_1FBE78         # jumptable 001FAF40 case 77
 patch=0,EE,2064C828,extended,0035DE70 //                                  .word loc_1FBEC0         # jumptable 001FAF40 case 78
@@ -108,30 +107,20 @@ patch=0,EE,205F91C0,extended,0035C7E8 //Hook call to ProcessCommands_0To99
 
 //                              CRunningScript__ProcessCommands_0To99:   # DATA XREF: seg000:_opcodeHandlerTable↓o
 //
-//                              var_60          = -0x60
-//                              var_5C          = -0x5C
-//                              var_58          = -0x58
-//                              var_50          = -0x50
-//                              var_40          = -0x40
-//                              var_30          = -0x30
-//                              var_20          = -0x20
-//                              var_10          = -0x10
-//                              var_C           = -0xC
-//                              var_8           = -8
 //
 
 
-patch=0,EE,2035C7E8,extended,27BDFFA0 //                                   addiu   $sp, -0x60       # Add Immediate Unsigned
+patch=0,EE,2035C7E8,extended,27BDFF80 //                                  addiu   $sp, -0x80       # Add Immediate Unsigned
 patch=0,EE,2035C7EC,extended,2CA10064 //                                  sltiu   $at, $a1, 0x64   # switch 100 cases
-patch=0,EE,2035C7F0,extended,FFBF0040 //                                  sd      $ra, 0x60+var_20($sp)  # Store Doubleword
-patch=0,EE,2035C7F4,extended,7FB20030 //                                  sq      $s2, 0x60+var_30($sp)  # Store Quadword
-patch=0,EE,2035C7F8,extended,7FB10020 //                                  sq      $s1, 0x60+var_40($sp)  # Store Quadword
+patch=0,EE,2035C7F0,extended,FFBF0060 //                                  sd      $ra, 0x60($sp)  # Store Doubleword
+patch=0,EE,2035C7F4,extended,7FB20050 //                                  sq      $s2, 0x50($sp)  # Store Quadword
+patch=0,EE,2035C7F8,extended,7FB10040 //                                  sq      $s1, 0x40($sp)  # Store Quadword
 patch=0,EE,2035C7FC,extended,0080902D //                                  move    $s2, $a0
-patch=0,EE,2035C800,extended,7FB00010 //                                  sq      $s0, 0x60+var_50($sp)  # Store Quadword
-patch=0,EE,2035C804,extended,E7B60008 //                                  swc1    $f22, 0x60+var_58($sp)  # Store Word from FPU
-patch=0,EE,2035C808,extended,E7B50004 //                                  swc1    $f21, 0x60+var_5C($sp)  # Store Word from FPU
+patch=0,EE,2035C800,extended,7FB00030 //                                  sq      $s0, 0x30($sp)  # Store Quadword
+patch=0,EE,2035C804,extended,E7B60008 //                                  swc1    $f22, 0x8($sp)  # Store Word from FPU
+patch=0,EE,2035C808,extended,E7B50004 //                                  swc1    $f21, 0x4($sp)  # Store Word from FPU
 patch=0,EE,2035C80C,extended,10200546 //                                  beqz    $at, def_1FAF40  # jumptable 001FAF40 default case, cases 61-65,71-76,84-87
-patch=0,EE,2035C810,extended,E7B40000 //                                  swc1    $f20, 0x60+var_60($sp)  # Store Word from FPU
+patch=0,EE,2035C810,extended,E7B40000 //                                  swc1    $f20, 0x0($sp)  # Store Word from FPU
 patch=0,EE,2035C814,extended,3C030065 //                                  lui     $v1, 0x65  # 'e'  # Load Upper Immediate
 patch=0,EE,2035C818,extended,00051080 //                                  sll     $v0, $a1, 2      # Shift Left Logical
 patch=0,EE,2035C81C,extended,2463C6F0 //                                  li      $v1, jpt_1FAF40  # Load Immediate
@@ -184,80 +173,344 @@ patch=0,EE,2035C88C,extended,0000102D //                                  move  
 
 
 patch=0,EE,2035C890,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
-patch=0,EE,2035C894,extended,24050002 //                                  li      $a1, 2           # Arg amount
+patch=0,EE,2035C894,extended,24050003 //                                  li      $a1, 3           # Arg amount
 patch=0,EE,2035C898,extended,00000000 //                                  nop
-patch=0,EE,2035C89c,extended,3C010070 //                                  lui     $at, 0x70  # Load upper value for ScriptParams
+patch=0,EE,2035C89C,extended,3C010070 //                                  lui     $at, 0x70  # Load upper value for ScriptParams
 patch=0,EE,2035C8A0,extended,8C22DFB0 //                                  lw      $v0, ScriptParams[0]($at)  # Address
-patch=0,EE,2035C8A4,extended,8C23DFB4 //                                  lw      $v1, ScriptParams[1]($at)  # Address
-patch=0,EE,2035C8A8,extended,00000000 //                                  nop
-patch=0,EE,2035C8AC,extended,24080001 //                                  li      $v0, 1                        # 0x1
-patch=0,EE,2035C8B0,extended,1068000C //                                  beq     $v1, $t0, 1param
-patch=0,EE,2035C8B4,extended,00000000 //                                  nop
-patch=0,EE,2035C8B8,extended,24080002 //                                  li      $v0, 2                        # 0x1
-patch=0,EE,2035C8BC,extended,10680011 //                                  beq     $v1, $t0, 2param
-patch=0,EE,2035C8C0,extended,00000000 //                                  nop
-patch=0,EE,2035C8C4,extended,24080003 //                                  li      $v0, 3
-patch=0,EE,2035C8C8,extended,10680017 //                                  beq     $v1, $t0, 2param
-patch=0,EE,2035C8CC,extended,00000000 //                                  nop
-patch=0,EE,2035C8D0,extended,24080004 //                                  li      $v0, 4
-patch=0,EE,2035C8D4,extended,1068001E //                                  beq     $v1, $t0, 2param
-patch=0,EE,2035C8D8,extended,00000000 //                                  nop
-patch=0,EE,2035C8DC,extended,10000025 //                                  b       call_func
-patch=0,EE,2035C8E0,extended,00000000 //                                  nop
-//                                                            1param:
-patch=0,EE,2035C8E4,extended,0240202D //                                  move    $a0, $s2  #this
-patch=0,EE,2035C8E8,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
-patch=0,EE,2035C8EC,extended,24050001 //                                  li      $a1, 1           # Arg amount
-patch=0,EE,2035C8F0,extended,00000000 //                                  nop
-patch=0,EE,2035C8F4,extended,3C010070 //                                  lui     $at, 0x70  # Load upper value for ScriptParams
-patch=0,EE,2035C8F8,extended,8C37DFB0 //                                  lw      $s7, ScriptParams[0]($at)  # Address
-patch=0,EE,2035C8FC,extended,1000001D //                                  b       call_func
-patch=0,EE,2035C900,extended,00000000 //                                  nop
-//                                                            2param:
-patch=0,EE,2035C904,extended,0240202D //                                  move    $a0, $s2  #this
-patch=0,EE,2035C908,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
-patch=0,EE,2035C90C,extended,24050002 //                                  li      $a1, 2           # Arg amount
-patch=0,EE,2035C910,extended,00000000 //                                  nop
-patch=0,EE,2035C914,extended,3C010070 //                                  lui     $at, 0x70  # Load upper value for ScriptParams
-patch=0,EE,2035C918,extended,8C37DFB0 //                                  lw      $s7, ScriptParams[0]($at)  # Address
-patch=0,EE,2035C91C,extended,8C36DFB4 //                                  lw      $s6, ScriptParams[1]($at)  # Address
-patch=0,EE,2035C920,extended,10000014 //                                  b       call_func
-patch=0,EE,2035C924,extended,00000000 //                                  nop
-//                                                            3param:
-patch=0,EE,2035C928,extended,0240202D //                                  move    $a0, $s2  #this
-patch=0,EE,2035C92C,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
-patch=0,EE,2035C930,extended,24050003 //                                  li      $a1, 3           # Arg amount
-patch=0,EE,2035C934,extended,00000000 //                                  nop
-patch=0,EE,2035C938,extended,3C010070 //                                  lui     $at, 0x70  # Load upper value for ScriptParams
-patch=0,EE,2035C93C,extended,8C37DFB0 //                                  lw      $s7, ScriptParams[0]($at)  # Address
-patch=0,EE,2035C940,extended,8C36DFB4 //                                  lw      $s6, ScriptParams[1]($at)  # Address
-patch=0,EE,2035C944,extended,8C35DFB8 //                                  lw      $s5, ScriptParams[2]($at)  # Address
-patch=0,EE,2035C948,extended,1000000A //                                  b       call_func
-patch=0,EE,2035C94C,extended,00000000 //                                  nop
-//                                                            4param:
-patch=0,EE,2035C950,extended,0240202D //                                  move    $a0, $s2  #this
-patch=0,EE,2035C954,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
-patch=0,EE,2035C958,extended,24050004 //                                  li      $a1, 4           # Arg amount
-patch=0,EE,2035C95C,extended,00000000 //                                  nop
-patch=0,EE,2035C960,extended,3C010070 //                                  lui     $at, 0x70  # Load upper value for ScriptParams
-patch=0,EE,2035C964,extended,8C37DFB0 //                                  lw      $s7, ScriptParams[0]($at)  # Address
-patch=0,EE,2035C968,extended,8C36DFB4 //                                  lw      $s6, ScriptParams[1]($at)  # Address
-patch=0,EE,2035C96C,extended,8C35DFB8 //                                  lw      $s5, ScriptParams[2]($at)  # Address
-patch=0,EE,2035C970,extended,8C34DFBC //                                  lw      $s4, ScriptParams[3]($at)  # Address
-//                                                            call_func:
-patch=0,EE,2035C974,extended,0240202D //                                  move    $a0, $s2  #this
-patch=0,EE,2035C978,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
-patch=0,EE,2035C97C,extended,24050001 //                                  li      $a1, 1           # Arg amount
-patch=0,EE,2035C980,extended,00000000 //                                  nop
-patch=0,EE,2035C984,extended,00143821 //                                  move    $a3, $s4
-patch=0,EE,2035C988,extended,00153021 //                                  move    $a2, $s5
-patch=0,EE,2035C98C,extended,00162821 //                                  move    $a1, $s6
-patch=0,EE,2035C990,extended,0040F809 //                                  jalr    $v0
-patch=0,EE,2035C994,extended,00172021 //                                  move    $a0, $s7
+patch=0,EE,2035C8A4,extended,8C23DFB4 //                                  lw      $v1, ScriptParams[1]($at)  # Argument quantity
+patch=0,EE,2035C8A8,extended,8C2DDFB8 //                                  lw      $t5, ScriptParams[2]($at)  # Return value?
+patch=0,EE,2035C8AC,extended,00000000 //                                  nop
+patch=0,EE,2035C8B0,extended,28680005 //                                  slti    $t0, $v1, 0x5      # less than 5?
+patch=0,EE,2035C8B4,extended,1500001C //                                  bne     $t0, $zero, decision_block  # if not, continue, else, jump to decision block
+patch=0,EE,2035C8B8,extended,00000000 //                                  nop
+patch=0,EE,2035C8BC,extended,0060782D //                                  move    $t7, $v1
+patch=0,EE,2035C8C0,extended,0240202D //                                  move    $a0, $s2  #this
+patch=0,EE,2035C8C4,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
+patch=0,EE,2035C8C8,extended,24050004 //                                  li      $a1, 4           # Arg amount
+patch=0,EE,2035C8CC,extended,3C010070 //                                  lui     $at, 0x70  # Load upper value for ScriptParams
+patch=0,EE,2035C8D0,extended,8C37DFB0 //                                  lw      $s7, ScriptParams[0]($at)  # Address
+patch=0,EE,2035C8D4,extended,8C36DFB4 //                                  lw      $s6, ScriptParams[1]($at)  # Address
+patch=0,EE,2035C8D8,extended,8C35DFB8 //                                  lw      $s5, ScriptParams[2]($at)  # Address
+patch=0,EE,2035C8DC,extended,8C34DFBC //                                  lw      $s4, ScriptParams[3]($at)  # Address
+patch=0,EE,2035C8E0,extended,24080004 //                                  addiu   $t0, 0x4
+patch=0,EE,2035C8E4,extended,01E87823 //                                  subu    $t7, $t0
+patch=0,EE,2035C8E8,extended,240E0010 //                                  li      $t6, 0x10
+patch=0,EE,2035C8EC,extended,01DD702D //                                  daddu   $t6, $sp
+patch=0,EE,2035C8F0,extended,0001C02D //                                  move    $t8, $at //change temporary stuff
+//                                                        arg_loop:
+patch=0,EE,2035C8F4,extended,00000000
+patch=0,EE,2035C8F8,extended,0240202D //                                  move    $a0, $s2  #this
+patch=0,EE,2035C8FC,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
+patch=0,EE,2035C900,extended,24050001 //                                  li      $a1, 1           # Arg amount
+patch=0,EE,2035C904,extended,8F09DFB0 //                                  lw      $t1, ScriptParams[0]($t8)
+patch=0,EE,2035C908,extended,ADC90000 //                                  sw      $t1, 0x0($t6)
+patch=0,EE,2035C90C,extended,25CE0004 //                                  addiu   $t6, 0x4
+patch=0,EE,2035C910,extended,27180004 //                                  addiu   $t8, 0x4
+patch=0,EE,2035C914,extended,240A0001 //                                  addiu   $t2, 0x1
+patch=0,EE,2035C918,extended,01EA7823 //                                  subu    $t7, $t2
+patch=0,EE,2035C91C,extended,15E0FFF5 //                                  bne     $v1, $zero, arg_loop
+
+patch=0,EE,2035C920,extended,00000000 //                                  nop
+patch=0,EE,2035C924,extended,10000035 //                                  b       call_func
+patch=0,EE,2035C928,extended,00000000 //                                  nop
+//                                                        decision_block:
+patch=0,EE,2035C92C,extended,10600033 //                                  beq     $v1, $zero, call_func      # 0 args
+patch=0,EE,2035C930,extended,00000000 //                                  nop
+patch=0,EE,2035C934,extended,24080001 //                                  li      $t0, 1
+patch=0,EE,2035C938,extended,1068000C //                                  beq     $v1, $t0, 1_param
+patch=0,EE,2035C93C,extended,00000000 //                                  nop
+patch=0,EE,2035C940,extended,24080002 //                                  li      $t0, 2
+patch=0,EE,2035C944,extended,10680011 //                                  beq     $v1, $t0, 2_param
+patch=0,EE,2035C948,extended,00000000 //                                  nop
+patch=0,EE,2035C94C,extended,24080003 //                                  li      $t0, 3
+patch=0,EE,2035C950,extended,10680017 //                                  beq     $v1, $t0, 3_param
+patch=0,EE,2035C954,extended,00000000 //                                  nop
+patch=0,EE,2035C958,extended,24080004 //                                  li      $t0, 4
+patch=0,EE,2035C95C,extended,1068001E //                                  beq     $v1, $t0, 4_param
+patch=0,EE,2035C960,extended,00000000 //                                  nop
+patch=0,EE,2035C964,extended,10000035 //                                  b       return_cmd
+patch=0,EE,2035C968,extended,00000000 //                                  nop
+//                                                        1_param:
+patch=0,EE,2035C96C,extended,0240202D //                                  move    $a0, $s2  #this
+patch=0,EE,2035C970,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
+patch=0,EE,2035C974,extended,24050001 //                                  li      $a1, 1           # Arg amount
+patch=0,EE,2035C978,extended,00000000 //                                  nop
+patch=0,EE,2035C97C,extended,3C010070 //                                  lui     $at, 0x70  # Load upper value for ScriptParams
+patch=0,EE,2035C980,extended,8C37DFB0 //                                  lw      $s7, ScriptParams[0]($at)  # Address
+patch=0,EE,2035C984,extended,1000001D //                                  b       call_func
+patch=0,EE,2035C988,extended,00000000 //                                  nop
+//                                                        2_param:
+patch=0,EE,2035C98C,extended,0240202D //                                  move    $a0, $s2  #this
+patch=0,EE,2035C990,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
+patch=0,EE,2035C994,extended,24050002 //                                  li      $a1, 2           # Arg amount
 patch=0,EE,2035C998,extended,00000000 //                                  nop
-//                                                            return_cmd:
-patch=0,EE,2035C99C,extended,10000696 //                                  b       loc_30D2C0       # Branch Always
-patch=0,EE,2035C9A0,extended,0000102D //                                  move    $v0, $zero
+patch=0,EE,2035C99C,extended,3C010070 //                                  lui     $at, 0x70  # Load upper value for ScriptParams
+patch=0,EE,2035C9A0,extended,8C37DFB0 //                                  lw      $s7, ScriptParams[0]($at)  # Address
+patch=0,EE,2035C9A4,extended,8C36DFB4 //                                  lw      $s6, ScriptParams[1]($at)  # Address
+patch=0,EE,2035C9A8,extended,10000014 //                                  b       call_func
+patch=0,EE,2035C9AC,extended,00000000 //                                  nop
+//                                                        3_param:
+patch=0,EE,2035C9B0,extended,0240202D //                                  move    $a0, $s2  #this
+patch=0,EE,2035C9B4,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
+patch=0,EE,2035C9B8,extended,24050003 //                                  li      $a1, 3           # Arg amount
+patch=0,EE,2035C9BC,extended,00000000 //                                  nop
+patch=0,EE,2035C9C0,extended,3C010070 //                                  lui     $at, 0x70  # Load upper value for ScriptParams
+patch=0,EE,2035C9C4,extended,8C37DFB0 //                                  lw      $s7, ScriptParams[0]($at)  # Address
+patch=0,EE,2035C9C8,extended,8C36DFB4 //                                  lw      $s6, ScriptParams[1]($at)  # Address
+patch=0,EE,2035C9CC,extended,8C35DFB8 //                                  lw      $s5, ScriptParams[2]($at)  # Address
+patch=0,EE,2035C9D0,extended,1000000A //                                  b       call_func
+patch=0,EE,2035C9D4,extended,00000000 //                                  nop
+//                                                        4_param:
+patch=0,EE,2035C9D8,extended,0240202D //                                  move    $a0, $s2  #this
+patch=0,EE,2035C9DC,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
+patch=0,EE,2035C9E0,extended,24050004 //                                  li      $a1, 4           # Arg amount
+patch=0,EE,2035C9E4,extended,00000000 //                                  nop
+patch=0,EE,2035C9E8,extended,3C010070 //                                  lui     $at, 0x70  # Load upper value for ScriptParams
+patch=0,EE,2035C9EC,extended,8C37DFB0 //                                  lw      $s7, ScriptParams[0]($at)  # Address
+patch=0,EE,2035C9F0,extended,8C36DFB4 //                                  lw      $s6, ScriptParams[1]($at)  # Address
+patch=0,EE,2035C9F4,extended,8C35DFB8 //                                  lw      $s5, ScriptParams[2]($at)  # Address
+patch=0,EE,2035C9F8,extended,8C34DFBC //                                  lw      $s4, ScriptParams[3]($at)  # Address
+//                                                        call_func:
+patch=0,EE,2035C9FC,extended,00000000 //                                  nop
+patch=0,EE,2035CA00,extended,00143821 //                                  move    $a3, $s4
+patch=0,EE,2035CA04,extended,00153021 //                                  move    $a2, $s5
+patch=0,EE,2035CA08,extended,00162821 //                                  move    $a1, $s6
+patch=0,EE,2035CA0C,extended,0040F809 //                                  jalr    $v0
+patch=0,EE,2035CA10,extended,00172021 //                                  move    $a0, $s7
+patch=0,EE,2035CA14,extended,11A00006 //                                  beq     $t5, $zero, return_cmd      # 0 args
+patch=0,EE,2035CA18,extended,00000000 //                                  nop
+patch=0,EE,2035CA1C,extended,3C010070 //                                  lui     $at, 0x70  # Load Upper Immediate
+patch=0,EE,2035CA20,extended,24050001 //                                  li      $a1, 1           # Load Immediate
+patch=0,EE,2035CA24,extended,AC22DFB0 //                                  sw      $v0, ScriptParams($at)  # Store Word
+patch=0,EE,2035CA28,extended,0240202D //                                  move    $a0, $s2  #this
+patch=0,EE,2035CA2C,extended,0C07DF48 //                                  jal     _ZN14CRunningScript15StoreParametersEs  # Jump And Link
+patch=0,EE,2035CA30,extended,00000000 //                                  nop
+//                                                        return_cmd:
+patch=0,EE,2035CA34,extended,0240202D //                                  move    $a0, $s2  #this
+patch=0,EE,2035CA38,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
+patch=0,EE,2035CA3C,extended,24050001 //                                  li      $a1, 1           # Arg amount
+patch=0,EE,2035CA40,extended,1000066D //                                  b       loc_30D2C0       # Branch Always
+patch=0,EE,2035CA44,extended,0000102D //                                  move    $v0, $zero
+patch=0,EE,2035CA48,extended,00000000 //                                  nop
+
+
+//                               # ---------------------------------------------------------------------------
+//                              call_method:                             # CODE XREF: CRunningScript__ProcessCommands_0To99+40↑j
+//                                                                       # DATA XREF: seg000:jpt_1FAF40↓o
+
+
+
+patch=0,EE,2035CA4C,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
+patch=0,EE,2035CA50,extended,24050004 //                                  li      $a1, 4           # Arg amount
+patch=0,EE,2035CA54,extended,00000000 //                                  nop
+patch=0,EE,2035CA58,extended,3C010070 //                                  lui     $at, 0x70  # Load upper value for ScriptParams
+patch=0,EE,2035CA5C,extended,8C22DFB0 //                                  lw      $v0, ScriptParams[0]($at)  # Address
+patch=0,EE,2035CA60,extended,8C37DFB4 //                                  lw      $s7, ScriptParams[1]($at)  # Address
+patch=0,EE,2035CA64,extended,8C23DFB8 //                                  lw      $v1, ScriptParams[2]($at)  # Argument quantity
+patch=0,EE,2035CA68,extended,8C2DDFBC //                                  lw      $t5, ScriptParams[3]($at)  # Return value?
+patch=0,EE,2035CA6C,extended,00000000 //                                  nop
+patch=0,EE,2035CA70,extended,28680004 //                                  slti    $t0, $v1, 0x4      # less than 4?
+patch=0,EE,2035CA74,extended,1500001C //                                  bne     $t0, $zero, decision_block  # if not, continue, else, jump to decision block
+patch=0,EE,2035CA78,extended,00000000 //                                  nop
+patch=0,EE,2035CA7C,extended,0060782D //                                  move    $t7, $v1
+patch=0,EE,2035CA80,extended,0240202D //                                  move    $a0, $s2  #this
+patch=0,EE,2035CA84,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
+patch=0,EE,2035CA88,extended,24050003 //                                  li      $a1, 3           # Arg amount
+patch=0,EE,2035CA8C,extended,3C010070 //                                  lui     $at, 0x70  # Load upper value for ScriptParams
+patch=0,EE,2035CA90,extended,8C36DFB0 //                                  lw      $s6, ScriptParams[0]($at)  # Address
+patch=0,EE,2035CA94,extended,8C35DFB4 //                                  lw      $s5, ScriptParams[1]($at)  # Address
+patch=0,EE,2035CA98,extended,8C34DFB8 //                                  lw      $s4, ScriptParams[2]($at)  # Address
+patch=0,EE,2035CA9C,extended,24080003 //                                  addiu   $t0, 0x3
+patch=0,EE,2035CAA0,extended,01E87823 //                                  subu    $t7, $t0
+patch=0,EE,2035CAA4,extended,240E0010 //                                  li      $t6, 0x10
+patch=0,EE,2035CAA8,extended,01DD702D //                                  daddu   $t6, $sp
+patch=0,EE,2035CAAC,extended,0001C02D //                                  move    $t8, $at //change temporary stuff
+//                                                        arg_loop:
+patch=0,EE,2035CAB0,extended,00000000
+patch=0,EE,2035CAB4,extended,0240202D //                                  move    $a0, $s2  #this
+patch=0,EE,2035CAB8,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
+patch=0,EE,2035CABC,extended,24050001 //                                  li      $a1, 1           # Arg amount
+patch=0,EE,2035CAC0,extended,8F09DFB0 //                                  lw      $t1, ScriptParams[0]($t8)
+patch=0,EE,2035CAC4,extended,ADC90000 //                                  sw      $t1, 0x0($t6)
+patch=0,EE,2035CAC8,extended,25CE0004 //                                  addiu   $t6, 0x4
+patch=0,EE,2035CACC,extended,27180004 //                                  addiu   $t8, 0x4
+patch=0,EE,2035CAD0,extended,240A0001 //                                  addiu   $t2, 0x1
+patch=0,EE,2035CAD4,extended,01EA7823 //                                  subu    $t7, $t2
+patch=0,EE,2035CAD8,extended,15E0FFF5 //                                  bne     $v1, $zero, arg_loop
+
+patch=0,EE,2035CADC,extended,00000000 //                                  nop
+patch=0,EE,2035CAE0,extended,10000028 //                                  b       call_func
+patch=0,EE,2035CAE4,extended,00000000 //                                  nop
+//                                                        decision_block:
+patch=0,EE,2035CAE8,extended,10600026 //                                  beq     $v1, $zero, call_func      # 0 args
+patch=0,EE,2035CAEC,extended,00000000 //                                  nop
+patch=0,EE,2035CAF0,extended,24080001 //                                  li      $t0, 1
+patch=0,EE,2035CAF4,extended,10680009 //                                  beq     $v1, $t0, 1_param
+patch=0,EE,2035CAF8,extended,00000000 //                                  nop
+patch=0,EE,2035CAFC,extended,24080002 //                                  li      $t0, 2
+patch=0,EE,2035CB00,extended,1068000F //                                  beq     $v1, $t0, 2_param
+patch=0,EE,2035CB04,extended,00000000 //                                  nop
+patch=0,EE,2035CB08,extended,24080003 //                                  li      $t0, 3
+patch=0,EE,2035CB0C,extended,10680014 //                                  beq     $v1, $t0, 3_param
+patch=0,EE,2035CB10,extended,00000000 //                                  nop
+patch=0,EE,2035CB14,extended,1000002D //                                  b       return_cmd
+patch=0,EE,2035CB18,extended,00000000 //                                  nop
+//                                                        1_param:
+patch=0,EE,2035CB1C,extended,0240202D //                                  move    $a0, $s2  #this
+patch=0,EE,2035CB20,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
+patch=0,EE,2035CB24,extended,24050001 //                                  li      $a1, 1           # Arg amount
+patch=0,EE,2035CB28,extended,00000000 //                                  nop
+patch=0,EE,2035CB2C,extended,3C010070 //                                  lui     $at, 0x70  # Load upper value for ScriptParams
+patch=0,EE,2035CB30,extended,8C36DFB0 //                                  lw      $s6, ScriptParams[0]($at)  # Address
+patch=0,EE,2035CB34,extended,10000013 //                                  b       call_func
+patch=0,EE,2035CB38,extended,00000000 //                                  nop
+//                                                        2_param:
+patch=0,EE,2035CB3C,extended,0240202D //                                  move    $a0, $s2  #this
+patch=0,EE,2035CB40,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
+patch=0,EE,2035CB44,extended,24050002 //                                  li      $a1, 2           # Arg amount
+patch=0,EE,2035CB48,extended,00000000 //                                  nop
+patch=0,EE,2035CB4C,extended,3C010070 //                                  lui     $at, 0x70  # Load upper value for ScriptParams
+patch=0,EE,2035CB50,extended,8C36DFB0 //                                  lw      $s6, ScriptParams[0]($at)  # Address
+patch=0,EE,2035CB54,extended,8C35DFB4 //                                  lw      $s5, ScriptParams[1]($at)  # Address
+patch=0,EE,2035CB58,extended,1000000A //                                  b       call_func
+patch=0,EE,2035CB5C,extended,00000000 //                                  nop
+//                                                        3_param:
+patch=0,EE,2035CB60,extended,0240202D //                                  move    $a0, $s2  #this
+patch=0,EE,2035CB64,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
+patch=0,EE,2035CB68,extended,24050003 //                                  li      $a1, 3           # Arg amount
+patch=0,EE,2035CB6C,extended,00000000 //                                  nop
+patch=0,EE,2035CB70,extended,3C010070 //                                  lui     $at, 0x70  # Load upper value for ScriptParams
+patch=0,EE,2035CB74,extended,8C36DFB0 //                                  lw      $s6, ScriptParams[0]($at)  # Address
+patch=0,EE,2035CB78,extended,8C35DFB4 //                                  lw      $s5, ScriptParams[1]($at)  # Address
+patch=0,EE,2035CB7C,extended,8C34DFB8 //                                  lw      $s4, ScriptParams[2]($at)  # Address
+patch=0,EE,2035CB80,extended,00000000 //                                  nop
+//                                                        call_func:
+patch=0,EE,2035CB84,extended,00000000 //                                  nop
+patch=0,EE,2035CB88,extended,00143821 //                                  move    $a3, $s4
+patch=0,EE,2035CB8C,extended,00153021 //                                  move    $a2, $s5
+patch=0,EE,2035CB90,extended,00162821 //                                  move    $a1, $s6
+patch=0,EE,2035CB94,extended,0040F809 //                                  jalr    $v0
+patch=0,EE,2035CB98,extended,00172021 //                                  move    $a0, $s7
+patch=0,EE,2035CB9C,extended,11A00006 //                                  beq     $t5, $zero, return_cmd      # 0 args
+patch=0,EE,2035CBA0,extended,00000000 //                                  nop
+patch=0,EE,2035CBA4,extended,3C010070 //                                  lui     $at, 0x70  # Load Upper Immediate
+patch=0,EE,2035CBA8,extended,24050001 //                                  li      $a1, 1           # Load Immediate
+patch=0,EE,2035CBAC,extended,AC22DFB0 //                                  sw      $v0, ScriptParams($at)  # Store Word
+patch=0,EE,2035CBB0,extended,0240202D //                                  move    $a0, $s2  #this
+patch=0,EE,2035CBB4,extended,0C07DF48 //                                  jal     _ZN14CRunningScript15StoreParametersEs  # Jump And Link
+patch=0,EE,2035CBB8,extended,00000000 //                                  nop
+//                                                        return_cmd:
+patch=0,EE,2035CBBC,extended,0240202D //                                  move    $a0, $s2  #this
+patch=0,EE,2035CBC0,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Call CollectParameters
+patch=0,EE,2035CBC4,extended,24050001 //                                  li      $a1, 1           # Arg amount
+patch=0,EE,2035CBC8,extended,1000060B //                                  b       loc_30D2C0       # Branch Always
+patch=0,EE,2035CBCC,extended,0000102D //                                  move    $v0, $zero
+patch=0,EE,2035CBD0,extended,00000000 //                                  nop
+
+//                              get_ped_struct:                          # CODE XREF: CRunningScript__ProcessCommands_0To99+40↑j
+//                                                                       # DATA XREF: seg000:jpt_1FAF40↓o
+
+
+patch=0,EE,2035CBD4,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Jump And Link
+patch=0,EE,2035CBD8,extended,24050001 //                                  li      $a1, 1           # Load Immediate
+patch=0,EE,2035CBDC,extended,00000000 //                                  nop
+patch=0,EE,2035CBE0,extended,3C010070 //                                  lui     $at, 0x70  # Load Upper Immediate
+patch=0,EE,2035CBE4,extended,8c25DFB0 //                                  lw      $a1, ScriptParams($at)  # Load Word
+patch=0,EE,2035CBE8,extended,00000000 //                                  nop
+patch=0,EE,2035CBEC,extended,3C010067 //                                  lui     $at, 0x67  # Load Upper Immediate
+patch=0,EE,2035CBF0,extended,0C07FEEC //                                  jal     ?atHandle@?$CPool@VCPed@@@@QAEPAVCVehicle@@I@Z
+patch=0,EE,2035CBF4,extended,8C24B918 //                                  lw      $a0, _ZN6CPools11ms_pPedPoolE($at)
+patch=0,EE,2035CBF8,extended,00000000 //                                  nop
+patch=0,EE,2035CBFC,extended,3C010070 //                                  lui     $at, 0x70  # Load Upper Immediate
+patch=0,EE,2035CC00,extended,24050001 //                                  li      $a1, 1           # Load Immediate
+patch=0,EE,2035CC04,extended,AC22DFB0 //                                  sw      $v0, ScriptParams($at)  # Store Word
+patch=0,EE,2035CC08,extended,0240202D //                                  move    $a0, $s2
+patch=0,EE,2035CC0C,extended,0C07DF48 //                                  jal     _ZN14CRunningScript15StoreParametersEs  # Jump And Link
+patch=0,EE,2035CC10,extended,00000000 //                                  nop
+patch=0,EE,2035CC14,extended,100005F8 //                                  b       loc_30D2C0       # Branch Always
+patch=0,EE,2035CC18,extended,0000102D //                                  move    $v0, $zero
+patch=0,EE,2035CC1C,extended,00000000 //                                  nop
+
+//                              get_vehicle_struct:                      # CODE XREF: CRunningScript__ProcessCommands_0To99+40↑j
+//                                                                       # DATA XREF: seg000:jpt_1FAF40↓o
+
+
+patch=0,EE,2035CC20,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Jump And Link
+patch=0,EE,2035CC24,extended,24050001 //                                  li      $a1, 1           # Load Immediate
+patch=0,EE,2035CC28,extended,00000000 //                                  nop
+patch=0,EE,2035CC2C,extended,3C010070 //                                  lui     $at, 0x70  # Load Upper Immediate
+patch=0,EE,2035CC30,extended,8c25DFB0 //                                  lw      $a1, ScriptParams($at)  # Load Word
+patch=0,EE,2035CC34,extended,00000000 //                                  nop
+patch=0,EE,2035CC38,extended,3C010067 //                                  lui     $at, 0x67  # Load Upper Immediate
+patch=0,EE,2035CC3C,extended,0C07FEDC //                                  jal     ?atHandle@?$CPool@VCVehicle@@@@QAEPAVCVehicle@@I@Z
+patch=0,EE,2035CC40,extended,8C24B91C //                                  lw      $a0, _ZN6CPools15ms_pVehiclePoolE($at)
+patch=0,EE,2035CC44,extended,00000000 //                                  nop
+patch=0,EE,2035CC48,extended,3C010070 //                                  lui     $at, 0x70  # Load Upper Immediate
+patch=0,EE,2035CC4C,extended,24050001 //                                  li      $a1, 1           # Load Immediate
+patch=0,EE,2035CC50,extended,AC22DFB0 //                                  sw      $v0, ScriptParams($at)  # Store Word
+patch=0,EE,2035CC54,extended,0240202D //                                  move    $a0, $s2
+patch=0,EE,2035CC58,extended,0C07DF48 //                                  jal     _ZN14CRunningScript15StoreParametersEs  # Jump And Link
+patch=0,EE,2035CC5C,extended,00000000 //                                  nop
+patch=0,EE,2035CC60,extended,100005E5 //                                  b       loc_30D2C0       # Branch Always
+patch=0,EE,2035CC64,extended,0000102D //                                  move    $v0, $zero
+patch=0,EE,2035CC68,extended,00000000 //                                  nop
+
+//                              get_object_struct:                      # CODE XREF: CRunningScript__ProcessCommands_0To99+40↑j
+//                                                                       # DATA XREF: seg000:jpt_1FAF40↓o
+
+
+
+patch=0,EE,2035CC6C,extended,0C07DDF4 //                                  jal     _ZN14CRunningScript17CollectParametersEs  # Jump And Link
+patch=0,EE,2035CC70,extended,24050001 //                                  li      $a1, 1           # Load Immediate
+patch=0,EE,2035CC74,extended,00000000 //                                  nop
+patch=0,EE,2035CC78,extended,3C010070 //                                  lui     $at, 0x70  # Load Upper Immediate
+patch=0,EE,2035CC7C,extended,8c25DFB0 //                                  lw      $a1, ScriptParams($at)  # Load Word
+patch=0,EE,2035CC80,extended,00000000 //                                  nop
+patch=0,EE,2035CC84,extended,3C010067 //                                  lui     $at, 0x67  # Load Upper Immediate
+patch=0,EE,2035CC88,extended,0C07FECC //                                  jal     _CPool_CObject__atHandle
+patch=0,EE,2035CC8C,extended,8C24B924 //                                  lw      $a0, _ZN6CPools14ms_pObjectPoolE($at)
+patch=0,EE,2035CC90,extended,00000000 //                                  nop
+patch=0,EE,2035CC94,extended,3C010070 //                                  lui     $at, 0x70  # Load Upper Immediate
+patch=0,EE,2035CC98,extended,24050001 //                                  li      $a1, 1           # Load Immediate
+patch=0,EE,2035CC9C,extended,AC22DFB0 //                                  sw      $v0, ScriptParams($at)  # Store Word
+patch=0,EE,2035CCA0,extended,0240202D //                                  move    $a0, $s2
+patch=0,EE,2035CCA4,extended,0C07DF48 //                                  jal     _ZN14CRunningScript15StoreParametersEs  # Jump And Link
+patch=0,EE,2035CCA8,extended,00000000 //                                  nop
+patch=0,EE,2035CCAC,extended,100005D2 //                                  b       loc_30D2C0       # Branch Always
+patch=0,EE,2035CCB0,extended,0000102D //                                  move    $v0, $zero
+patch=0,EE,2035CCB4,extended,00000000 //                                  nop
+
+//                              get_this_script_struct:                  # CODE XREF: CRunningScript__ProcessCommands_0To99+40↑j
+//                                                                       # DATA XREF: seg000:jpt_1FAF40↓o
+
+
+patch=0,EE,2035CCB8,extended,3C010070 //                                  lui     $at, 0x70  # Load Upper Immediate
+patch=0,EE,2035CCBC,extended,24050001 //                                  li      $a1, 1           # Load Immediate
+patch=0,EE,2035CCC0,extended,AC32DFB0 //                                  sw      $s2, ScriptParams($at)  # Store Word
+patch=0,EE,2035CCC4,extended,0240202D //                                  move    $a0, $s2
+patch=0,EE,2035CCC8,extended,0C07DF48 //                                  jal     _ZN14CRunningScript15StoreParametersEs  # Jump And Link
+patch=0,EE,2035CCCC,extended,00000000 //                                  nop
+patch=0,EE,2035CCD0,extended,100005C9 //                                  b       loc_30D2C0       # Branch Always
+patch=0,EE,2035CCD4,extended,0000102D //                                  move    $v0, $zero
+patch=0,EE,2035CCD8,extended,00000000 //                                  nop
+
+//                               # ---------------------------------------------------------------------------
+//                              get_var_offset:                          # CODE XREF: CRunningScript__ProcessCommands_0To99+40↑j
+//                                                                       # DATA XREF: seg000:jpt_1FAF40↓o
+
+
+patch=0,EE,2035CCDC,extended,0C07E0C0 //                                  jal     _ZN14CRunningScript26GetPointerToScriptVariableEh  # Jump And Link
+patch=0,EE,2035CCE0,extended,24050002 //                                  li      $a1, 2           # Load Immediate
+patch=0,EE,2035CCE4,extended,00000000 //                                  nop
+patch=0,EE,2035CCE8,extended,3C010070 //                                  lui     $at, 0x70  # Load Upper Immediate
+patch=0,EE,2035CCEC,extended,24050001 //                                  li      $a1, 1           # Load Immediate
+patch=0,EE,2035CCF0,extended,ac22DFB0 //                                  sw      $v0, ScriptParams($at)  # Store Word
+patch=0,EE,2035CCF4,extended,0240202D //                                  move    $a0, $s2
+patch=0,EE,2035CCF8,extended,0C07DF48 //                                  jal     _ZN14CRunningScript15StoreParametersEs  # Jump And Link
+patch=0,EE,2035CCFC,extended,00000000 //                                  nop
+patch=0,EE,2035CD00,extended,100005BD //                                  b       loc_30D2C0       # Branch Always
+patch=0,EE,2035CD04,extended,0000102D //                                  move    $v0, $zero
+patch=0,EE,2035CD08,extended,00000000 //                                  nop
 
 //                               # ---------------------------------------------------------------------------
 //
@@ -2039,17 +2292,16 @@ patch=0,EE,2035E3F4,extended,00000000 //                                  nop
 //
 //                              loc_1FC448:                              # CODE XREF: CRunningScript__ProcessCommands_0To99:loc_1FAF48↑j
 //                                                                       # CRunningScript__ProcessCommands_0To99+6C↑j ...
-patch=0,EE,2035E3F8,extended,DFBF0040 //                                  ld      $ra, 0x60+var_20($sp)  # Load Doubleword
-patch=0,EE,2035E3FC,extended,7BB20030 //                                  lq      $s2, 0x60+var_30($sp)  # Load Quadword
-patch=0,EE,2035E400,extended,C7B60008 //                                  lwc1    $f22, 0x60+var_58($sp)  # Load Word to FPU
-patch=0,EE,2035E404,extended,7BB10020 //                                  lq      $s1, 0x60+var_40($sp)  # Load Quadword
-patch=0,EE,2035E408,extended,C7B50004 //                                  lwc1    $f21, 0x60+var_5C($sp)  # Load Word to FPU
-patch=0,EE,2035E40C,extended,7BB00010 //                                  lq      $s0, 0x60+var_50($sp)  # Load Quadword
-patch=0,EE,2035E410,extended,C7B40000 //                                  lwc1    $f20, 0x60+var_60($sp)  # Load Word to FPU
+patch=0,EE,2035E3F8,extended,DFBF0060 //                                  ld      $ra, 0x60($sp)  # Load Doubleword
+patch=0,EE,2035E3FC,extended,7BB20050 //                                  lq      $s2, 0x50($sp)  # Load Quadword
+patch=0,EE,2035E400,extended,C7B60008 //                                  lwc1    $f22, 0x8($sp)  # Load Word to FPU
+patch=0,EE,2035E404,extended,7BB10040 //                                  lq      $s1, 0x40($sp)  # Load Quadword
+patch=0,EE,2035E408,extended,C7B50004 //                                  lwc1    $f21, 0x4($sp)  # Load Word to FPU
+patch=0,EE,2035E40C,extended,7BB00030 //                                  lq      $s0, 0x30($sp)  # Load Quadword
+patch=0,EE,2035E410,extended,C7B40000 //                                  lwc1    $f20, 0x0($sp)  # Load Word to FPU
 patch=0,EE,2035E414,extended,03E00008 //                                  jr      $ra              # Jump Register
-patch=0,EE,2035E418,extended,27BD0060 //                                  addiu   $sp, 0x60        # Add Immediate Unsigned
+patch=0,EE,2035E418,extended,27BD0080 //                                  addiu   $sp, 0x80        # Add Immediate Unsigned
 //                               # End of function CRunningScript__ProcessCommands_0To99
 //
 //                               # ---------------------------------------------------------------------------
 patch=0,EE,2035E41C,extended,000000000
-
