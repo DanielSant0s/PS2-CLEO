@@ -1,0 +1,73 @@
+//                              string_format_func:
+patch=0,EE,20100D58,extended,27BDFF50//                                   addiu   $sp, -0xB0
+patch=0,EE,20100D5C,extended,FFBF00A8 //                                  sd      $ra, 0xA0+var_s8($sp)
+patch=0,EE,20100D60,extended,FFBE00A0 //                                  sd      $fp, 0xA0+var_s0($sp)
+patch=0,EE,20100D64,extended,03A0F025 //                                  move    $fp, $sp
+patch=0,EE,20100D68,extended,AFC40090 //                                  sw      $a0, 0xA0+var_10($fp)
+patch=0,EE,20100D6C,extended,8FC40090 //                                  lw      $a0, 0xA0+var_10($fp)  # this
+patch=0,EE,20100D70,extended,0C0D8000 //                                  jal     CRunningScript::GetBytePointer(void)
+patch=0,EE,20100D74,extended,00000000 //                                  nop
+patch=0,EE,20100D78,extended,90420000 //                                  lbu     $v0, 0($v0)
+patch=0,EE,20100D7C,extended,1040000B //                                  beqz    $v0, loc_100DAC
+patch=0,EE,20100D80,extended,00000000 //                                  nop
+patch=0,EE,20100D84,extended,8FC40090 //                                  lw      $a0, 0xA0+var_10($fp)  # this
+patch=0,EE,20100D88,extended,0C0D8000 //                                  jal     CRunningScript::GetBytePointer(void)
+patch=0,EE,20100D8C,extended,00000000 //                                  nop
+patch=0,EE,20100D90,extended,90420000 //                                  lbu     $v0, 0($v0)
+patch=0,EE,20100D94,extended,2C420009 //                                  sltiu   $v0, 9
+patch=0,EE,20100D98,extended,10400004 //                                  beqz    $v0, loc_100DAC
+patch=0,EE,20100D9C,extended,00000000 //                                  nop
+patch=0,EE,20100DA0,extended,24020001 //                                  li      $v0, 1
+patch=0,EE,20100DA4,extended,10000002 //                                  b       loc_100DB0
+patch=0,EE,20100DA8,extended,00000000 //                                  nop
+//                               # ---------------------------------------------------------------------------
+//
+//                              loc_100DAC:
+patch=0,EE,20100DAC,extended,00001025 //                                  move    $v0, $zero
+//
+//                              loc_100DB0:
+patch=0,EE,20100DB0,extended,1040000A //                                  beqz    $v0, loc_100DDC
+patch=0,EE,20100DB4,extended,00000000 //                                  nop
+patch=0,EE,20100DB8,extended,24050001 //                                  li      $a1, 1
+patch=0,EE,20100DBC,extended,8FC40090 //                                  lw      $a0, 0xA0+var_10($fp)
+patch=0,EE,20100DC0,extended,0C07DDF4 //                                  jal     GetScriptParams(CRunningScript *,int)
+patch=0,EE,20100DC4,extended,00000000 //                                  nop
+patch=0,EE,20100DC8,extended,3C020070 //                                  lui     $v0, 0x70
+patch=0,EE,20100DCC,extended,8C42DFB0 //                                  lw      $v0, opcodeParams
+patch=0,EE,20100DD0,extended,AFC20000 //                                  sw      $v0, 0xA0+var_A0($fp)
+patch=0,EE,20100DD4,extended,10000006 //                                  b       loc_100DF0
+patch=0,EE,20100DD8,extended,00000000 //                                  nop
+//                               # ---------------------------------------------------------------------------
+//
+//                              loc_100DDC:                              # int
+patch=0,EE,20100DDC,extended,24050001 //                                  li      $a1, 1
+patch=0,EE,20100DE0,extended,8FC40090 //                                  lw      $a0, 0xA0+var_10($fp)  # CRunningScript *
+patch=0,EE,20100DE4,extended,0C07E0C0 //                                  jal     GetScriptParamPointer(CRunningScript *,int)
+patch=0,EE,20100DE8,extended,00000000 //                                  nop
+patch=0,EE,20100DEC,extended,AFC20000 //                                  sw      $v0, 0xA0+var_A0($fp)
+//
+//                              loc_100DF0:
+patch=0,EE,20100DF0,extended,27C20008 //                                  addiu   $v0, $fp, 0xA0+var_98
+patch=0,EE,20100DF4,extended,24060080 //                                  li      $a2, 0x80        # unsigned __int8
+patch=0,EE,20100DF8,extended,00402825 //                                  move    $a1, $v0         # char *
+patch=0,EE,20100DFC,extended,8FC40090 //                                  lw      $a0, 0xA0+var_10($fp)  # CRunningScript *
+patch=0,EE,20100E00,extended,0C0D800B //                                  jal     readString(CRunningScript *,char *,uchar)
+patch=0,EE,20100E04,extended,00000000 //                                  nop
+patch=0,EE,20100E08,extended,27C20008 //                                  addiu   $v0, $fp, 0xA0+var_98
+patch=0,EE,20100E0C,extended,00403825 //                                  move    $a3, $v0         # char *
+patch=0,EE,20100E10,extended,2406FFFF //                                  li      $a2, 0xFFFFFFFF  # unsigned int
+patch=0,EE,20100E14,extended,8FC50000 //                                  lw      $a1, 0xA0+var_A0($fp)  # char *
+patch=0,EE,20100E18,extended,8FC40090 //                                  lw      $a0, 0xA0+var_10($fp)  # CRunningScript *
+patch=0,EE,20100E1C,extended,0C0D81C7 //                                  jal     format(CRunningScript *,char *,uint,char const*)
+patch=0,EE,20100E20,extended,00000000 //                                  nop
+patch=0,EE,20100E24,extended,24050001 //                                  li      $a1, 1
+patch=0,EE,20100E28,extended,8FC40090 //                                  lw      $a0, 0xA0+var_10($fp)
+patch=0,EE,20100E2C,extended,0C07DDF4 //                                  jal     GetScriptParams(CRunningScript *,int)
+patch=0,EE,20100E30,extended,00000000 //                                  nop
+patch=0,EE,20100E34,extended,00000000 //                                  nop
+patch=0,EE,20100E38,extended,03C0E825 //                                  move    $sp, $fp
+patch=0,EE,20100E3C,extended,DFBF00A8 //                                  ld      $ra, 0xA0+var_s8($sp)
+patch=0,EE,20100E40,extended,DFBE00A0 //                                  ld      $fp, 0xA0+var_s0($sp)
+patch=0,EE,20100E44,extended,27BD00B0 //                                  addiu   $sp, 0xB0
+patch=0,EE,20100E48,extended,03E00008 //                                  jr      $ra
+patch=0,EE,20100E4C,extended,00000000 //                                  nop

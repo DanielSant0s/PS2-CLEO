@@ -1,0 +1,74 @@
+.text:00100D58                               string_format_func:
+.text:00100D58 50 FF BD 27                                   addiu   $sp, -0xB0
+.text:00100D5C A8 00 BF FF                                   sd      $ra, 0xA0+var_s8($sp)
+.text:00100D60 A0 00 BE FF                                   sd      $fp, 0xA0+var_s0($sp)
+.text:00100D64 25 F0 A0 03                                   move    $fp, $sp
+.text:00100D68 90 00 C4 AF                                   sw      $a0, 0xA0+var_10($fp)
+.text:00100D6C 90 00 C4 8F                                   lw      $a0, 0xA0+var_10($fp)  # this
+.text:00100D70 A4 03 04 0C                                   jal     CRunningScript::GetBytePointer(void)
+.text:00100D74 00 00 00 00                                   nop
+.text:00100D78 00 00 42 90                                   lbu     $v0, 0($v0)
+.text:00100D7C 0B 00 40 10                                   beqz    $v0, loc_100DAC
+.text:00100D80 00 00 00 00                                   nop
+.text:00100D84 90 00 C4 8F                                   lw      $a0, 0xA0+var_10($fp)  # this
+.text:00100D88 A4 03 04 0C                                   jal     CRunningScript::GetBytePointer(void)
+.text:00100D8C 00 00 00 00                                   nop
+.text:00100D90 00 00 42 90                                   lbu     $v0, 0($v0)
+.text:00100D94 09 00 42 2C                                   sltiu   $v0, 9
+.text:00100D98 04 00 40 10                                   beqz    $v0, loc_100DAC
+.text:00100D9C 00 00 00 00                                   nop
+.text:00100DA0 01 00 02 24                                   li      $v0, 1
+.text:00100DA4 02 00 00 10                                   b       loc_100DB0
+.text:00100DA8 00 00 00 00                                   nop
+.text:00100DAC                                # ---------------------------------------------------------------------------
+.text:00100DAC
+.text:00100DAC                               loc_100DAC:
+.text:00100DAC 25 10 00 00                                   move    $v0, $zero
+.text:00100DB0
+.text:00100DB0                               loc_100DB0:
+.text:00100DB0 0A 00 40 10                                   beqz    $v0, loc_100DDC
+.text:00100DB4 00 00 00 00                                   nop
+.text:00100DB8 01 00 05 24                                   li      $a1, 1
+.text:00100DBC 90 00 C4 8F                                   lw      $a0, 0xA0+var_10($fp)
+.text:00100DC0 D2 00 04 0C                                   jal     GetScriptParams(CRunningScript *,int)
+.text:00100DC4 00 00 00 00                                   nop
+.text:00100DC8 12 00 02 3C E8 98 42 8C                       lw      $v0, opcodeParams
+.text:00100DD0 00 00 C2 AF                                   sw      $v0, 0xA0+var_A0($fp)
+.text:00100DD4 06 00 00 10                                   b       loc_100DF0
+.text:00100DD8 00 00 00 00                                   nop
+.text:00100DDC                                # ---------------------------------------------------------------------------
+.text:00100DDC
+.text:00100DDC                               loc_100DDC:                              # int
+.text:00100DDC 01 00 05 24                                   li      $a1, 1
+.text:00100DE0 90 00 C4 8F                                   lw      $a0, 0xA0+var_10($fp)  # CRunningScript *
+.text:00100DE4 AF 03 04 0C                                   jal     GetScriptParamPointer(CRunningScript *,int)
+.text:00100DE8 00 00 00 00                                   nop
+.text:00100DEC 00 00 C2 AF                                   sw      $v0, 0xA0+var_A0($fp)
+.text:00100DF0
+.text:00100DF0                               loc_100DF0:
+.text:00100DF0 08 00 C2 27                                   addiu   $v0, $fp, 0xA0+var_98
+.text:00100DF4 80 00 06 24                                   li      $a2, 0x80        # unsigned __int8
+.text:00100DF8 25 28 40 00                                   move    $a1, $v0         # char *
+.text:00100DFC 90 00 C4 8F                                   lw      $a0, 0xA0+var_10($fp)  # CRunningScript *
+.text:00100E00 F6 00 04 0C                                   jal     readString(CRunningScript *,char *,uchar)
+.text:00100E04 00 00 00 00                                   nop
+.text:00100E08 08 00 C2 27                                   addiu   $v0, $fp, 0xA0+var_98
+.text:00100E0C 25 38 40 00                                   move    $a3, $v0         # char *
+.text:00100E10 FF FF 06 24                                   li      $a2, 0xFFFFFFFF  # unsigned int
+.text:00100E14 00 00 C5 8F                                   lw      $a1, 0xA0+var_A0($fp)  # char *
+.text:00100E18 90 00 C4 8F                                   lw      $a0, 0xA0+var_10($fp)  # CRunningScript *
+.text:00100E1C 67 01 04 0C                                   jal     format(CRunningScript *,char *,uint,char const*)
+.text:00100E20 00 00 00 00                                   nop
+.text:00100E24 01 00 05 24                                   li      $a1, 1
+.text:00100E28 90 00 C4 8F                                   lw      $a0, 0xA0+var_10($fp)
+.text:00100E2C D2 00 04 0C                                   jal     GetScriptParams(CRunningScript *,int)
+.text:00100E30 00 00 00 00                                   nop
+.text:00100E34 00 00 00 00                                   nop
+.text:00100E38 25 E8 C0 03                                   move    $sp, $fp
+.text:00100E3C A8 00 BF DF                                   ld      $ra, 0xA0+var_s8($sp)
+.text:00100E40 A0 00 BE DF                                   ld      $fp, 0xA0+var_s0($sp)
+.text:00100E44 B0 00 BD 27                                   addiu   $sp, 0xB0
+.text:00100E48 08 00 E0 03                                   jr      $ra
+.text:00100E4C 00 00 00 00                                   nop
+.text:00100E4C                                # } // starts at 100D58
+.text:00100E4C                                # End of function opcode_0AD3(CRunningScript *)
