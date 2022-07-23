@@ -40,7 +40,7 @@ union SCRIPT_VAR
 
 class CRunningScript
 {
-protected:
+public:
     CRunningScript *Previous;			// +0x0
     CRunningScript *Next;				// +0x4
     char Name[8];						// +0x8
@@ -63,8 +63,6 @@ protected:
     bool bWastedOrBusted;				// +0xD4
     void *SceneSkipIP;					// +0xD8
     bool bIsMission;					// +0xDC
-
-public:
     inline	bool				IsActive() {
         return bIsActive;
     }

@@ -26,6 +26,7 @@ typedef uint64_t QWORD;
 
 SCRIPT_VAR opcodeParams[35] __attribute__((section(".opcodeparams")));
 
+void  __attribute__((section(".setparams"))) SetScriptParams(CRunningScript *thread, int count){ count ++; return; }
 void  __attribute__((section(".getparams"))) GetScriptParams(CRunningScript *thread, int count){ return; }
 void  __attribute__((section(".getstrparam")))  GetScriptStringParam(CRunningScript *thread, char *ptr, uint8_t len){ return; }
 inline SCRIPT_VAR*  __attribute__((section(".getparamptr"))) GetScriptParamPointer(CRunningScript *thread, int count){ return (SCRIPT_VAR*)0xCAFE; }
@@ -178,7 +179,8 @@ char *readString(CRunningScript *thread, char* buf = nullptr, uint8_t size = 0)
 					if (*iter == 'p' || *iter == 'P')
 					{
 						GetScriptParams(thread, 1);
-						sprintf(bufaiter, "%08X", opcodeParams[0].dwParam);
+						static const char  __attribute__((section(".ptrstr"))) ptrstr[] = "%08X";
+						sprintf(bufaiter, ptrstr, opcodeParams[0].dwParam);
 					}
 					else
 					{
@@ -232,11 +234,133 @@ int opcode_0AD3(CRunningScript *thread)
 	return OR_CONTINUE;
 }
 
+bool   __attribute__((section("._ZN12CCutsceneMgr32IsCutsceneSkipButtonBeingPressedEv"))) CCutsceneMgr_IsCutsceneSkipButtonBeingPressed(){ return true; }
+void* CTheScripts_ScriptSpace __attribute__((section("._ZN11CTheScripts11ScriptSpaceE")));
+void  __attribute__((section("._ZN14CRunningScript18DoDeatharrestCheckEv"))) CRunningScript_DoDeatharrestCheck(CRunningScript *thread){ return; }
+bool CTheScripts_FailCurrentMission __attribute__((section("._ZN11CTheScripts18FailCurrentMissionE")));
+size_t CTimer_m_snTimeInMilliseconds __attribute__((section("._ZN6CTimer22m_snTimeInMillisecondsE")));
+void __attribute__((section("._ZN11CTheScripts31ReinitialiseSwitchStatementDataEv"))) CTheScripts_ReinitialiseSwitchStatementData(){ return; }
+int _StyledText_2[2] __attribute__((section(".style2")));
+size_t CTheScripts_CommandsExecuted  __attribute__((section(".CTheScripts_CommandsExecuted")));
+int __attribute__((section(".opcodeTable"))) (*opcodeHandlerTable[100])(CRunningScript* thread, int opcode);
+
+void __attribute__((section("._ZN14CRunningScript7ProcessEv"))) CRunningScript_Process(CRunningScript *thread)
+{
+    void *v2; // eax
+    bool v3; // zf
+    uint16_t v4; // ax
+    WORD *v5; // ecx
+    unsigned int v6; // eax
+
+    if ( thread->SceneSkipIP && CCutsceneMgr_IsCutsceneSkipButtonBeingPressed() )
+    {
+        _StyledText_2[0] = 0;
+        v2 = thread->SceneSkipIP;
+        if ( (int)v2 >= 0 )
+            thread->CurrentIP = (BYTE*)&CTheScripts_ScriptSpace + (DWORD)v2;
+        else
+            thread->CurrentIP = (BYTE*)(thread->BaseIP - (DWORD)v2);
+        thread->SceneSkipIP = 0;
+        thread->WakeTime = 0;
+    }
+    if ( thread->bUseMissionCleanup )
+        CRunningScript_DoDeatharrestCheck(thread);
+    if ( thread->bIsMission && CTheScripts_FailCurrentMission == 1 )
+    {
+        v3 = thread->SP == 1;
+        if ( thread->SP > 1u )
+        {
+            v4 = thread->SP;
+            do
+                --v4;
+            while ( v4 > 1u );
+            thread->SP = v4;
+            v3 = v4 == 1;
+        }
+        if ( v3 )
+        {
+            thread->SP = 0;
+            thread->CurrentIP = thread->Stack[offsetof(CRunningScript, Previous)];
+        }
+    }
+    CTheScripts_ReinitialiseSwitchStatementData();
+    if ( CTimer_m_snTimeInMilliseconds >= thread->WakeTime )
+    {
+        do
+        {
+            ++CTheScripts_CommandsExecuted;
+            v5 = (WORD*)thread->CurrentIP;
+            v6 = (WORD)*v5;
+            thread->CurrentIP = (BYTE*)(v5 + 1);
+            thread->NotFlag = (v6 & 0x8000) != 0;
+        }
+        while ( !opcodeHandlerTable[(int16_t)(v6 & 0x7FFF) / 100](thread, v6 & 0x7FFF) );
+    }
+}
+
+int __attribute__((section(".CLEOSwitcher"))) switch_CLEO_opcodes(CRunningScript* thread, uint16_t opcode){
+	uint32_t* address;
+	short size;
+	int result = 0;
+
+	switch (opcode){
+	case 0xA8C:
+		GetScriptParams(thread, 3);
+		address = (uint32_t*)opcodeParams[0].dwParam;
+		size = opcodeParams[1].wParam;
+
+		switch(size){
+		case 1:
+			*address = opcodeParams[2].ucParam;
+			break;
+		case 2:
+			*address = opcodeParams[2].wParam;
+			break;
+		case 4:
+			*address = opcodeParams[2].dwParam;
+			break;
+		default:
+			return -1;
+			break;
+		}
+
+		result = 0;
+		break;
+
+	case 0xA8D:
+		GetScriptParams(thread, 2);
+		address = (uint32_t*)opcodeParams[0].dwParam;
+		size = opcodeParams[1].wParam;
+
+		switch(size){
+		case 1:
+			opcodeParams[0].ucParam = (uint8_t)(*address);
+			break;
+		case 2:
+			opcodeParams[0].wParam = (uint16_t)(*address);
+			break;
+		case 4:
+			opcodeParams[0].dwParam = *address;
+			break;
+		default:
+			return -1;
+			break;
+		}
+
+		SetScriptParams(thread, 1);
+
+		result = 0;
+		break;
+	
+	default:
+		result = -1;
+		break;
+	}
+
+	return result;
+}
+
 int main(int argc, char *argv[])
 {
-
-    CRunningScript* test;
-	opcode_0AD3(test);
-
   return 0;
 }

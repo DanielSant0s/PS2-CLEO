@@ -1,74 +1,190 @@
-.text:00100D58                               string_format_func:
-.text:00100D58 50 FF BD 27                                   addiu   $sp, -0xB0
-.text:00100D5C A8 00 BF FF                                   sd      $ra, 0xA0+var_s8($sp)
-.text:00100D60 A0 00 BE FF                                   sd      $fp, 0xA0+var_s0($sp)
-.text:00100D64 25 F0 A0 03                                   move    $fp, $sp
-.text:00100D68 90 00 C4 AF                                   sw      $a0, 0xA0+var_10($fp)
-.text:00100D6C 90 00 C4 8F                                   lw      $a0, 0xA0+var_10($fp)  # this
-.text:00100D70 A4 03 04 0C                                   jal     CRunningScript::GetBytePointer(void)
-.text:00100D74 00 00 00 00                                   nop
-.text:00100D78 00 00 42 90                                   lbu     $v0, 0($v0)
-.text:00100D7C 0B 00 40 10                                   beqz    $v0, loc_100DAC
-.text:00100D80 00 00 00 00                                   nop
-.text:00100D84 90 00 C4 8F                                   lw      $a0, 0xA0+var_10($fp)  # this
-.text:00100D88 A4 03 04 0C                                   jal     CRunningScript::GetBytePointer(void)
-.text:00100D8C 00 00 00 00                                   nop
-.text:00100D90 00 00 42 90                                   lbu     $v0, 0($v0)
-.text:00100D94 09 00 42 2C                                   sltiu   $v0, 9
-.text:00100D98 04 00 40 10                                   beqz    $v0, loc_100DAC
-.text:00100D9C 00 00 00 00                                   nop
-.text:00100DA0 01 00 02 24                                   li      $v0, 1
-.text:00100DA4 02 00 00 10                                   b       loc_100DB0
-.text:00100DA8 00 00 00 00                                   nop
-.text:00100DAC                                # ---------------------------------------------------------------------------
-.text:00100DAC
-.text:00100DAC                               loc_100DAC:
-.text:00100DAC 25 10 00 00                                   move    $v0, $zero
-.text:00100DB0
-.text:00100DB0                               loc_100DB0:
-.text:00100DB0 0A 00 40 10                                   beqz    $v0, loc_100DDC
-.text:00100DB4 00 00 00 00                                   nop
-.text:00100DB8 01 00 05 24                                   li      $a1, 1
-.text:00100DBC 90 00 C4 8F                                   lw      $a0, 0xA0+var_10($fp)
-.text:00100DC0 D2 00 04 0C                                   jal     GetScriptParams(CRunningScript *,int)
-.text:00100DC4 00 00 00 00                                   nop
-.text:00100DC8 12 00 02 3C E8 98 42 8C                       lw      $v0, opcodeParams
-.text:00100DD0 00 00 C2 AF                                   sw      $v0, 0xA0+var_A0($fp)
-.text:00100DD4 06 00 00 10                                   b       loc_100DF0
-.text:00100DD8 00 00 00 00                                   nop
-.text:00100DDC                                # ---------------------------------------------------------------------------
-.text:00100DDC
-.text:00100DDC                               loc_100DDC:                              # int
-.text:00100DDC 01 00 05 24                                   li      $a1, 1
-.text:00100DE0 90 00 C4 8F                                   lw      $a0, 0xA0+var_10($fp)  # CRunningScript *
-.text:00100DE4 AF 03 04 0C                                   jal     GetScriptParamPointer(CRunningScript *,int)
-.text:00100DE8 00 00 00 00                                   nop
-.text:00100DEC 00 00 C2 AF                                   sw      $v0, 0xA0+var_A0($fp)
-.text:00100DF0
-.text:00100DF0                               loc_100DF0:
-.text:00100DF0 08 00 C2 27                                   addiu   $v0, $fp, 0xA0+var_98
-.text:00100DF4 80 00 06 24                                   li      $a2, 0x80        # unsigned __int8
-.text:00100DF8 25 28 40 00                                   move    $a1, $v0         # char *
-.text:00100DFC 90 00 C4 8F                                   lw      $a0, 0xA0+var_10($fp)  # CRunningScript *
-.text:00100E00 F6 00 04 0C                                   jal     readString(CRunningScript *,char *,uchar)
-.text:00100E04 00 00 00 00                                   nop
-.text:00100E08 08 00 C2 27                                   addiu   $v0, $fp, 0xA0+var_98
-.text:00100E0C 25 38 40 00                                   move    $a3, $v0         # char *
-.text:00100E10 FF FF 06 24                                   li      $a2, 0xFFFFFFFF  # unsigned int
-.text:00100E14 00 00 C5 8F                                   lw      $a1, 0xA0+var_A0($fp)  # char *
-.text:00100E18 90 00 C4 8F                                   lw      $a0, 0xA0+var_10($fp)  # CRunningScript *
-.text:00100E1C 67 01 04 0C                                   jal     format(CRunningScript *,char *,uint,char const*)
-.text:00100E20 00 00 00 00                                   nop
-.text:00100E24 01 00 05 24                                   li      $a1, 1
-.text:00100E28 90 00 C4 8F                                   lw      $a0, 0xA0+var_10($fp)
-.text:00100E2C D2 00 04 0C                                   jal     GetScriptParams(CRunningScript *,int)
-.text:00100E30 00 00 00 00                                   nop
-.text:00100E34 00 00 00 00                                   nop
-.text:00100E38 25 E8 C0 03                                   move    $sp, $fp
-.text:00100E3C A8 00 BF DF                                   ld      $ra, 0xA0+var_s8($sp)
-.text:00100E40 A0 00 BE DF                                   ld      $fp, 0xA0+var_s0($sp)
-.text:00100E44 B0 00 BD 27                                   addiu   $sp, 0xB0
-.text:00100E48 08 00 E0 03                                   jr      $ra
-.text:00100E4C 00 00 00 00                                   nop
-.text:00100E4C                                # } // starts at 100D58
-.text:00100E4C                                # End of function opcode_0AD3(CRunningScript *)
+.text:0035C7E8                                # _DWORD __fastcall switch_CLEO_opcodes(CRunningScript *, unsigned __int16)
+.text:0035C7E8                                               .globl switch_CLEO_opcodes(CRunningScript *, unsigned short)
+.text:0035C7E8                               switch_CLEO_opcodes(CRunningScript *, unsigned short):
+.text:0035C7E8
+.text:0035C7E8                               var_20          = -0x20
+.text:0035C7E8                               var_1C          = -0x1C
+.text:0035C7E8                               var_18          = -0x18
+.text:0035C7E8                               var_10          = -0x10
+.text:0035C7E8                               var_C           = -0xC
+.text:0035C7E8                               var_s0          =  0
+.text:0035C7E8                               var_s8          =  8
+.text:0035C7E8
+.text:0035C7E8                                # __unwind {
+.text:0035C7E8 D0 FF BD 27                                   addiu   $sp, -0x30
+.text:0035C7EC 28 00 BF FF                                   sd      $ra, 0x20+var_s8($sp)
+.text:0035C7F0 20 00 BE FF                                   sd      $fp, 0x20+var_s0($sp)
+.text:0035C7F4 25 F0 A0 03                                   move    $fp, $sp
+.text:0035C7F8 10 00 C4 AF                                   sw      $a0, 0x20+var_10($fp)
+.text:0035C7FC 25 10 A0 00                                   move    $v0, $a1
+.text:0035C800 14 00 C2 A7                                   sh      $v0, 0x20+var_C($fp)
+.text:0035C804 00 00 C0 AF                                   sw      $zero, 0x20+var_20($fp)
+.text:0035C808 14 00 C2 97                                   lhu     $v0, 0x20+var_C($fp)
+.text:0035C80C 8C 0A 03 24                                   li      $v1, 0xA8C
+.text:0035C810 06 00 43 10                                   beq     $v0, $v1, loc_35C82C
+.text:0035C814 00 00 00 00                                   nop
+.text:0035C818 8D 0A 03 24                                   li      $v1, 0xA8D
+.text:0035C81C 3A 00 43 10                                   beq     $v0, $v1, loc_35C908
+.text:0035C820 00 00 00 00                                   nop
+.text:0035C824 71 00 00 10                                   b       loc_35C9EC
+.text:0035C828 00 00 00 00                                   nop
+.text:0035C82C                                # ---------------------------------------------------------------------------
+.text:0035C82C
+.text:0035C82C                               loc_35C82C:                              # int
+.text:0035C82C 03 00 05 24                                   li      $a1, 3
+.text:0035C830 10 00 C4 8F                                   lw      $a0, 0x20+var_10($fp)  # CRunningScript *
+.text:0035C834 F4 DD 07 0C                                   jal     GetScriptParams(CRunningScript *,int)
+.text:0035C838 00 00 00 00                                   nop
+.text:0035C83C 70 00 02 3C B0 DF 42 8C                       lw      $v0, opcodeParams
+.text:0035C844 04 00 C2 AF                                   sw      $v0, 0x20+var_1C($fp)
+.text:0035C848 70 00 02 3C B0 DF 42 24                       li      $v0, opcodeParams
+.text:0035C850 04 00 42 94                                   lhu     $v0, (word_6FDFB4 - 0x6FDFB0)($v0)
+.text:0035C854 08 00 C2 A7                                   sh      $v0, 0x20+var_18($fp)
+.text:0035C858 08 00 C2 87                                   lh      $v0, 0x20+var_18($fp)
+.text:0035C85C 04 00 03 24                                   li      $v1, 4
+.text:0035C860 1C 00 43 10                                   beq     $v0, $v1, loc_35C8D4
+.text:0035C864 00 00 00 00                                   nop
+.text:0035C868 05 00 43 28                                   slti    $v1, $v0, 5
+.text:0035C86C 20 00 60 10                                   beqz    $v1, loc_35C8F0
+.text:0035C870 00 00 00 00                                   nop
+.text:0035C874 01 00 03 24                                   li      $v1, 1
+.text:0035C878 06 00 43 10                                   beq     $v0, $v1, loc_35C894
+.text:0035C87C 00 00 00 00                                   nop
+.text:0035C880 02 00 03 24                                   li      $v1, 2
+.text:0035C884 0B 00 43 10                                   beq     $v0, $v1, loc_35C8B4
+.text:0035C888 00 00 00 00                                   nop
+.text:0035C88C 18 00 00 10                                   b       loc_35C8F0
+.text:0035C890 00 00 00 00                                   nop
+.text:0035C894                                # ---------------------------------------------------------------------------
+.text:0035C894
+.text:0035C894                               loc_35C894:
+.text:0035C894 70 00 02 3C B0 DF 42 24                       li      $v0, opcodeParams
+.text:0035C89C 08 00 42 90                                   lbu     $v0, (dword_6FDFB8 - 0x6FDFB0)($v0)
+.text:0035C8A0 25 18 40 00                                   move    $v1, $v0
+.text:0035C8A4 04 00 C2 8F                                   lw      $v0, 0x20+var_1C($fp)
+.text:0035C8A8 00 00 43 AC                                   sw      $v1, 0($v0)
+.text:0035C8AC 13 00 00 10                                   b       loc_35C8FC
+.text:0035C8B0 00 00 00 00                                   nop
+.text:0035C8B4                                # ---------------------------------------------------------------------------
+.text:0035C8B4
+.text:0035C8B4                               loc_35C8B4:
+.text:0035C8B4 70 00 02 3C B0 DF 42 24                       li      $v0, opcodeParams
+.text:0035C8BC 08 00 42 84                                   lh      $v0, (dword_6FDFB8 - 0x6FDFB0)($v0)
+.text:0035C8C0 25 18 40 00                                   move    $v1, $v0
+.text:0035C8C4 04 00 C2 8F                                   lw      $v0, 0x20+var_1C($fp)
+.text:0035C8C8 00 00 43 AC                                   sw      $v1, 0($v0)
+.text:0035C8CC 0B 00 00 10                                   b       loc_35C8FC
+.text:0035C8D0 00 00 00 00                                   nop
+.text:0035C8D4                                # ---------------------------------------------------------------------------
+.text:0035C8D4
+.text:0035C8D4                               loc_35C8D4:
+.text:0035C8D4 70 00 02 3C B0 DF 42 24                       li      $v0, opcodeParams
+.text:0035C8DC 08 00 43 8C                                   lw      $v1, (dword_6FDFB8 - 0x6FDFB0)($v0)
+.text:0035C8E0 04 00 C2 8F                                   lw      $v0, 0x20+var_1C($fp)
+.text:0035C8E4 00 00 43 AC                                   sw      $v1, 0($v0)
+.text:0035C8E8 04 00 00 10                                   b       loc_35C8FC
+.text:0035C8EC 00 00 00 00                                   nop
+.text:0035C8F0                                # ---------------------------------------------------------------------------
+.text:0035C8F0
+.text:0035C8F0                               loc_35C8F0:
+.text:0035C8F0 FF FF 02 24                                   li      $v0, 0xFFFFFFFF
+.text:0035C8F4 41 00 00 10                                   b       loc_35C9FC
+.text:0035C8F8 00 00 00 00                                   nop
+.text:0035C8FC                                # ---------------------------------------------------------------------------
+.text:0035C8FC
+.text:0035C8FC                               loc_35C8FC:
+.text:0035C8FC 00 00 C0 AF                                   sw      $zero, 0x20+var_20($fp)
+.text:0035C900 3D 00 00 10                                   b       loc_35C9F8
+.text:0035C904 00 00 00 00                                   nop
+.text:0035C908                                # ---------------------------------------------------------------------------
+.text:0035C908
+.text:0035C908                               loc_35C908:                              # int
+.text:0035C908 02 00 05 24                                   li      $a1, 2
+.text:0035C90C 10 00 C4 8F                                   lw      $a0, 0x20+var_10($fp)  # CRunningScript *
+.text:0035C910 F4 DD 07 0C                                   jal     GetScriptParams(CRunningScript *,int)
+.text:0035C914 00 00 00 00                                   nop
+.text:0035C918 70 00 02 3C B0 DF 42 8C                       lw      $v0, opcodeParams
+.text:0035C920 04 00 C2 AF                                   sw      $v0, 0x20+var_1C($fp)
+.text:0035C924 70 00 02 3C B0 DF 42 24                       li      $v0, opcodeParams
+.text:0035C92C 04 00 42 94                                   lhu     $v0, (word_6FDFB4 - 0x6FDFB0)($v0)
+.text:0035C930 08 00 C2 A7                                   sh      $v0, 0x20+var_18($fp)
+.text:0035C934 08 00 C2 87                                   lh      $v0, 0x20+var_18($fp)
+.text:0035C938 04 00 03 24                                   li      $v1, 4
+.text:0035C93C 1B 00 43 10                                   beq     $v0, $v1, loc_35C9AC
+.text:0035C940 00 00 00 00                                   nop
+.text:0035C944 05 00 43 28                                   slti    $v1, $v0, 5
+.text:0035C948 1E 00 60 10                                   beqz    $v1, loc_35C9C4
+.text:0035C94C 00 00 00 00                                   nop
+.text:0035C950 01 00 03 24                                   li      $v1, 1
+.text:0035C954 06 00 43 10                                   beq     $v0, $v1, loc_35C970
+.text:0035C958 00 00 00 00                                   nop
+.text:0035C95C 02 00 03 24                                   li      $v1, 2
+.text:0035C960 0A 00 43 10                                   beq     $v0, $v1, loc_35C98C
+.text:0035C964 00 00 00 00                                   nop
+.text:0035C968 16 00 00 10                                   b       loc_35C9C4
+.text:0035C96C 00 00 00 00                                   nop
+.text:0035C970                                # ---------------------------------------------------------------------------
+.text:0035C970
+.text:0035C970                               loc_35C970:
+.text:0035C970 04 00 C2 8F                                   lw      $v0, 0x20+var_1C($fp)
+.text:0035C974 00 00 42 8C                                   lw      $v0, 0($v0)
+.text:0035C978 FF 00 43 30                                   andi    $v1, $v0, 0xFF
+.text:0035C97C 70 00 02 3C                                   lui     $v0, 0x70  # 'p'
+.text:0035C980 B0 DF 43 A0                                   sb      $v1, opcodeParams
+.text:0035C984 12 00 00 10                                   b       loc_35C9D0
+.text:0035C988 00 00 00 00                                   nop
+.text:0035C98C                                # ---------------------------------------------------------------------------
+.text:0035C98C
+.text:0035C98C                               loc_35C98C:
+.text:0035C98C 04 00 C2 8F                                   lw      $v0, 0x20+var_1C($fp)
+.text:0035C990 00 00 42 8C                                   lw      $v0, 0($v0)
+.text:0035C994 00 1C 02 00                                   sll     $v1, $v0, 16
+.text:0035C998 03 1C 03 00                                   sra     $v1, 16
+.text:0035C99C 70 00 02 3C                                   lui     $v0, 0x70  # 'p'
+.text:0035C9A0 B0 DF 43 A4                                   sh      $v1, opcodeParams
+.text:0035C9A4 0A 00 00 10                                   b       loc_35C9D0
+.text:0035C9A8 00 00 00 00                                   nop
+.text:0035C9AC                                # ---------------------------------------------------------------------------
+.text:0035C9AC
+.text:0035C9AC                               loc_35C9AC:
+.text:0035C9AC 04 00 C2 8F                                   lw      $v0, 0x20+var_1C($fp)
+.text:0035C9B0 00 00 43 8C                                   lw      $v1, 0($v0)
+.text:0035C9B4 70 00 02 3C                                   lui     $v0, 0x70  # 'p'
+.text:0035C9B8 B0 DF 43 AC                                   sw      $v1, opcodeParams
+.text:0035C9BC 04 00 00 10                                   b       loc_35C9D0
+.text:0035C9C0 00 00 00 00                                   nop
+.text:0035C9C4                                # ---------------------------------------------------------------------------
+.text:0035C9C4
+.text:0035C9C4                               loc_35C9C4:
+.text:0035C9C4 FF FF 02 24                                   li      $v0, 0xFFFFFFFF
+.text:0035C9C8 0C 00 00 10                                   b       loc_35C9FC
+.text:0035C9CC 00 00 00 00                                   nop
+.text:0035C9D0                                # ---------------------------------------------------------------------------
+.text:0035C9D0
+.text:0035C9D0                               loc_35C9D0:                              # int
+.text:0035C9D0 01 00 05 24                                   li      $a1, 1
+.text:0035C9D4 10 00 C4 8F                                   lw      $a0, 0x20+var_10($fp)  # CRunningScript *
+.text:0035C9D8 48 DF 07 0C                                   jal     SetScriptParams(CRunningScript *,int)
+.text:0035C9DC 00 00 00 00                                   nop
+.text:0035C9E0 00 00 C0 AF                                   sw      $zero, 0x20+var_20($fp)
+.text:0035C9E4 04 00 00 10                                   b       loc_35C9F8
+.text:0035C9E8 00 00 00 00                                   nop
+.text:0035C9EC                                # ---------------------------------------------------------------------------
+.text:0035C9EC
+.text:0035C9EC                               loc_35C9EC:
+.text:0035C9EC FF FF 02 24                                   li      $v0, 0xFFFFFFFF
+.text:0035C9F0 00 00 C2 AF                                   sw      $v0, 0x20+var_20($fp)
+.text:0035C9F4 00 00 00 00                                   nop
+.text:0035C9F8
+.text:0035C9F8                               loc_35C9F8:
+.text:0035C9F8 00 00 C2 8F                                   lw      $v0, 0x20+var_20($fp)
+.text:0035C9FC
+.text:0035C9FC                               loc_35C9FC:
+.text:0035C9FC 25 E8 C0 03                                   move    $sp, $fp
+.text:0035CA00 28 00 BF DF                                   ld      $ra, 0x20+var_s8($sp)
+.text:0035CA04 20 00 BE DF                                   ld      $fp, 0x20+var_s0($sp)
+.text:0035CA08 30 00 BD 27                                   addiu   $sp, 0x30
+.text:0035CA0C 08 00 E0 03                                   jr      $ra
+.text:0035CA10 00 00 00 00                                   nop
+.text:0035CA10                                # } // starts at 35C7E8
+.text:0035CA10                                # End of function switch_CLEO_opcodes(CRunningScript *,ushort)
