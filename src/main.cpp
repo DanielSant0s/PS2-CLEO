@@ -126,6 +126,11 @@ inline void   SkipUnusedParameters(CRunningScript *thread)
 	thread->ReadDataByte();
 }
 
+inline void ThreadJump(CRunningScript *thread, int off)
+{
+	thread->SetIp(off < 0 ? thread->GetBasePointer() - off : (BYTE*)CTheScripts_ScriptSpace + off);
+}
+
 // a pointer automatically convertible to integral types
 union memory_pointer
 {
@@ -166,11 +171,16 @@ OpcodeResult opcode_0A96(CRunningScript *thread);
 OpcodeResult opcode_0A97(CRunningScript *thread);
 OpcodeResult opcode_0A98(CRunningScript *thread);
 OpcodeResult opcode_0A9F(CRunningScript *thread);
+OpcodeResult opcode_0AA0(CRunningScript *thread);
+OpcodeResult opcode_0AA1(CRunningScript *thread);
 OpcodeResult opcode_0AA5(CRunningScript *thread);
 OpcodeResult opcode_0AA6(CRunningScript *thread);
 OpcodeResult opcode_0AA7(CRunningScript *thread);
 OpcodeResult opcode_0AA8(CRunningScript *thread);
+OpcodeResult opcode_0AC6(CRunningScript *thread);
+OpcodeResult opcode_0AC7(CRunningScript *thread);
 OpcodeResult opcode_0ACA(CRunningScript *thread);
+OpcodeResult opcode_0ACE(CRunningScript *thread);
 OpcodeResult opcode_0AD3(CRunningScript *thread);
 OpcodeResult opcode_defa(CRunningScript *thread);
 
@@ -180,16 +190,16 @@ CustomOpcodeHandler   customOpcodeHandlers[100] =
 	opcode_0A91, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
 	opcode_0A96, opcode_0A97, opcode_0A98, opcode_defa, opcode_defa,
 	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_0A9F,
-	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
+	opcode_0AA0, opcode_0AA1, opcode_defa, opcode_defa, opcode_defa,
 	opcode_0AA5, opcode_0AA6, opcode_0AA7, opcode_0AA8, opcode_defa,
 	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
 	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
 	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
 	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
 	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
-	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
+	opcode_defa, opcode_defa, opcode_defa, opcode_0AC6, opcode_0AC7,
 	opcode_defa, opcode_defa, opcode_0ACA, opcode_defa, opcode_defa,
-	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
+	opcode_defa, opcode_0ACE, opcode_defa, opcode_defa, opcode_defa,
 	opcode_defa, opcode_0AD3, opcode_defa, opcode_defa, opcode_defa,
 	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
 	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
@@ -296,6 +306,7 @@ inline  CRunningScript& operator<<(CRunningScript& thread, memory_pointer pval)
 
 static const char  __attribute__((section(".rodata"))) int_fmt[] = "%d";
 static const char  __attribute__((section(".rodata")))  ptrstr[] = "%08X";
+static const char  __attribute__((section(".rodata")))  fltstr[] = "%f";
 static const char  __attribute__((section(".rodata")))  none[] = "(null)";
 
 char  *readString(CRunningScript *thread, char* buf = nullptr, uint8_t size = 0)
@@ -445,7 +456,7 @@ int  format(CRunningScript *thread, char *str, size_t len, const char *format)
 						*iter == 'g' || *iter == 'G')
 					{
 						GetScriptParams(thread, 1);
-						sprintf(bufaiter, fmtbufa, __extendsfdf2(opcodeParams[0].fParam));
+						sprintf(bufaiter, fltstr, __extendsfdf2(opcodeParams[0].fParam));
 					}
 					else
 					{
@@ -492,7 +503,6 @@ OpcodeResult   opcode_0A8C(CRunningScript *thread)
 	GetScriptParams(thread, 3);
 	DWORD *Address = (DWORD*)opcodeParams[0].pParam;
 	DWORD size = opcodeParams[1].dwParam;
-	//WORD value = opcodeParams[2].dwParam;
 
 	switch(size){
 	default:
@@ -511,16 +521,17 @@ OpcodeResult   opcode_0A8C(CRunningScript *thread)
 //0A8D=3,%3d% = read_memory %1d% size %2d%
 OpcodeResult   opcode_0A8D(CRunningScript *thread)
 {
-	GetScriptParams(thread, 2);
-	DWORD *Address = (DWORD*)opcodeParams[0].dwParam;
-	DWORD size = opcodeParams[1].wParam;
+	DWORD *Address;
+	DWORD size;
+
+	*thread >> Address >> size;
 
 	switch(size){
 	default:
-		opcodeParams[0].ucParam = (uint8_t)(*Address);
+		opcodeParams[0].ucParam = *(uint8_t*)Address;
 		break;
 	case 2:
-		opcodeParams[0].wParam = (uint16_t)(*Address);
+		opcodeParams[0].wParam = *(uint16_t*)Address;
 		break;
 	case 4:
 		opcodeParams[0].dwParam = *Address;
@@ -598,8 +609,27 @@ OpcodeResult   opcode_0A98(CRunningScript *thread)
 //0A9F=1,%1d% = current_thread_pointer
 OpcodeResult   opcode_0A9F(CRunningScript *thread)
 {
+	opcodeParams[0].dwParam = (int)thread;
 	SetScriptParams(thread, 1);
-	opcodeParams[0].pParam = (void*)thread;
+	return OR_CONTINUE;
+}
+
+//0AA0=1,gosub_if_false %1p%
+OpcodeResult opcode_0AA0(CRunningScript *thread)
+{
+	int off;
+	*thread >> off;
+	if (thread->GetConditionResult()) return OR_CONTINUE;
+	thread->PushStack(thread->GetBytePointer());
+	ThreadJump(thread, off);
+	return OR_CONTINUE;
+}
+
+//0AA1=0,return_if_false
+OpcodeResult opcode_0AA1(CRunningScript *thread)
+{
+	if (thread->GetConditionResult()) return OR_CONTINUE;
+	thread->SetIp(thread->PopStack());
 	return OR_CONTINUE;
 }
 
@@ -716,6 +746,7 @@ OpcodeResult   opcode_0AA6(CRunningScript *thread)
 	void(*func)(void*, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, 
 			SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, 
 			SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR);
+			
 	void *struc;
 	DWORD numParams;
 	DWORD stackAlign;
@@ -906,13 +937,16 @@ OpcodeResult opcode_0AA7(CRunningScript *thread)
 	}
 
 	// call function
-	opcodeParams[0].dwParam = func(arguments[0], arguments[1],  arguments[2],  arguments[3], arguments[4], 
+	DWORD result;
+
+	result =  func(arguments[0], arguments[1],  arguments[2],  arguments[3], arguments[4], 
 		 			arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], 
 		 			arguments[10], arguments[11], arguments[12], arguments[13], arguments[14]);
 
-	SetScriptParams(thread, 1);
+	*thread << result;
 
 	SkipUnusedParameters(thread);
+
 	return OR_CONTINUE;
 }
 
@@ -934,41 +968,104 @@ OpcodeResult   opcode_0AA8(CRunningScript *thread)
 	int i = 0;
 	for (SCRIPT_VAR *arg = arguments; arg != arguments_end; ++arg)
 	{
-		BYTE dType = *thread->GetBytePointer();
-		if(dType == DT_FLOAT){
-			GetScriptParams(thread, 1);
-			arg->fParam = opcodeParams[i].fParam;
-			if(i == 0)  __asm__ ("swc1 $f12, 0(%0) \n" : : "r" (&arg->fParam));
-			else if(i == 1)  __asm__ ("lwc1 $f13, 0(%0) \n" : : "r" (&arg->fParam));
-			else if(i == 2)  __asm__ ("lwc1 $f14, 0(%0) \n" : : "r" (&arg->fParam));
-			else if(i == 3)  __asm__ ("lwc1 $f15, 0(%0) \n" : : "r" (&arg->fParam));
-			else if(i == 4)  __asm__ ("lwc1 $f16, 0(%0) \n" : : "r" (&arg->fParam));
-			else if(i == 5)  __asm__ ("lwc1 $f17, 0(%0) \n" : : "r" (&arg->fParam));
-			else if(i == 6)  __asm__ ("lwc1 $f18, 0(%0) \n" : : "r" (&arg->fParam));
-			else if(i == 7)  __asm__ ("lwc1 $f19, 0(%0) \n" : : "r" (&arg->fParam));
-			else if(i == 8)  __asm__ ("lwc1 $f20, 0(%0) \n" : : "r" (&arg->fParam));
-			else if(i == 9)  __asm__ ("lwc1 $f21, 0(%0) \n" : : "r" (&arg->fParam));
-			else if(i == 10) __asm__ ("lwc1 $f22, 0(%0) \n" : : "r" (&arg->fParam));
-			else if(i == 11) __asm__ ("lwc1 $f23, 0(%0) \n" : : "r" (&arg->fParam));
-			else if(i == 12) __asm__ ("lwc1 $f24, 0(%0) \n" : : "r" (&arg->fParam));
-			else if(i == 13) __asm__ ("lwc1 $f25, 0(%0) \n" : : "r" (&arg->fParam));
-			else if(i == 14) __asm__ ("lwc1 $f26, 0(%0) \n" : : "r" (&arg->fParam));
+		switch (*thread->GetBytePointer())
+		{
+		case DT_FLOAT:
+			*thread >> arg->fParam;
+			switch(i)
+			{
+				case 0:
+					__asm__ ("lwc1 $f12, 0(%0) \n" : : "r" (&arg->fParam));
+					break;
+				case 1:  
+					__asm__ ("lwc1 $f13, 0(%0) \n" : : "r" (&arg->fParam));
+					break;
+				case 2:  
+					__asm__ ("lwc1 $f14, 0(%0) \n" : : "r" (&arg->fParam));
+					break;
+				case 3:  
+					__asm__ ("lwc1 $f15, 0(%0) \n" : : "r" (&arg->fParam));
+					break;
+				case 4:  
+					__asm__ ("lwc1 $f16, 0(%0) \n" : : "r" (&arg->fParam));
+					break;
+				case 5:  
+					__asm__ ("lwc1 $f17, 0(%0) \n" : : "r" (&arg->fParam));
+					break;
+				case 6:  
+					__asm__ ("lwc1 $f18, 0(%0) \n" : : "r" (&arg->fParam));
+					break;
+				case 7: 
+					__asm__ ("lwc1 $f19, 0(%0) \n" : : "r" (&arg->fParam));
+					break;
+				case 8:  
+					__asm__ ("lwc1 $f20, 0(%0) \n" : : "r" (&arg->fParam));
+					break;
+				case 9:  
+					__asm__ ("lwc1 $f21, 0(%0) \n" : : "r" (&arg->fParam));
+					break;
+				case 10: 
+					__asm__ ("lwc1 $f22, 0(%0) \n" : : "r" (&arg->fParam));
+					break;
+				case 11: 
+					__asm__ ("lwc1 $f23, 0(%0) \n" : : "r" (&arg->fParam));
+					break;
+				case 12: 
+					__asm__ ("lwc1 $f24, 0(%0) \n" : : "r" (&arg->fParam));
+					break;
+				case 13: 
+					__asm__ ("lwc1 $f25, 0(%0) \n" : : "r" (&arg->fParam));
+					break;
+				case 14: 
+					__asm__ ("lwc1 $f26, 0(%0) \n" : : "r" (&arg->fParam));
+					break;
+			}
 			i++;
-		} else if((dType == DT_DWORD) || (dType == DT_WORD) || (dType == DT_BYTE) || 
-		          (dType == DT_VAR) || (dType == DT_LVAR) || (dType == DT_VAR_ARRAY) || (dType == DT_LVAR_ARRAY)){
+			break;
+		case DT_DWORD:
+		case DT_WORD:
+		case DT_BYTE:
+		case DT_VAR:
+		case DT_LVAR:
+		case DT_VAR_ARRAY:
+		case DT_LVAR_ARRAY:
 			*thread >> arg->dwParam;
-		} else if((dType == DT_VAR_STRING) || (dType == DT_LVAR_STRING) || (dType == DT_VAR_TEXTLABEL) || (dType == DT_LVAR_TEXTLABEL)){
+			break;
+		case DT_VAR_STRING:
+		case DT_LVAR_STRING:
+		case DT_VAR_TEXTLABEL:
+		case DT_LVAR_TEXTLABEL:
 			arg->pParam = GetScriptParamPointer(thread, 1);
-		} else if((dType == DT_VARLEN_STRING) || (dType == DT_TEXTLABEL)){
+			break;
+		case DT_VARLEN_STRING:
+		case DT_TEXTLABEL:
 			(*arg).pcParam = readString(thread, textParams[currTextParam++], 128);
 		}
 	}
 
-	*thread << func(struc, arguments[0], arguments[1],  arguments[2],  arguments[3], arguments[4], 
+	DWORD result;
+
+	result =  func(struc, arguments[0], arguments[1],  arguments[2],  arguments[3], arguments[4], 
 		 			arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], 
 		 			arguments[10], arguments[11], arguments[12], arguments[13], arguments[14]);
 
-	SkipUnusedParameters(thread);
+	*thread << result;
+	return OR_CONTINUE;
+}
+
+//0AC6=2,%2d% = label %1p% offset
+OpcodeResult opcode_0AC6(CRunningScript *thread)
+{
+	int label;
+	*thread >> label;
+	*thread << (label < 0 ? thread->GetBasePointer() - label : (BYTE*)CTheScripts_ScriptSpace + label);
+	return OR_CONTINUE;
+}
+
+//0AC7=2,%2d% = var %1d% offset
+OpcodeResult opcode_0AC7(CRunningScript *thread)
+{
+	*thread << GetScriptParamPointer(thread, 1);
 	return OR_CONTINUE;
 }
 
@@ -976,6 +1073,17 @@ OpcodeResult   opcode_0AA8(CRunningScript *thread)
 OpcodeResult   opcode_0ACA(CRunningScript *thread)
 {	
 	PrintHelp(readString(thread), 0, 0, 0);
+	return OR_CONTINUE;
+}
+
+OpcodeResult opcode_0ACE(CRunningScript *thread)
+{
+	char fmt[128];
+	char text[128];
+	readString(thread, fmt, sizeof(fmt));
+	format(thread, text, sizeof(text), fmt);
+	PrintHelp(text, 0, 0, 0);
+	SkipUnusedParameters(thread);
 	return OR_CONTINUE;
 }
 
