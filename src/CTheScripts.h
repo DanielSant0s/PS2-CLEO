@@ -1,4 +1,3 @@
-#pragma once
 
 enum eDataType
 {
@@ -63,70 +62,70 @@ public:
     bool bWastedOrBusted;				// +0xD4
     void *SceneSkipIP;					// +0xD8
     bool bIsMission;					// +0xDC
-    inline	bool				IsActive() {
+    inline	bool				 IsActive() {
         return bIsActive;
     }
-    inline	bool				IsExternal() {
+    inline	bool				 IsExternal() {
         return bIsExternal;
     }
-    inline	bool				IsMission() {
+    inline	bool			     IsMission() {
         return bIsMission;
     }
-    inline	const char		*	GetName() {
+    inline	const char		*    GetName() {
         return Name;
     }
-    inline	BYTE			*	GetBasePointer() {
+    inline	BYTE			*	 GetBasePointer() {
         return (BYTE*)BaseIP;
     }
-    inline	BYTE			*	GetBytePointer() {
+    inline	BYTE			*	 GetBytePointer() {
         return CurrentIP;
     }
-    inline	void				SetIp(void *ip) {
+    inline	void				 SetIp(void *ip) {
         CurrentIP = (BYTE*)ip;
     }
-    inline	void				SetBaseIp(void *ip) {
+    inline	void				 SetBaseIp(void *ip) {
         BaseIP = ip;
     }
-    inline	CRunningScript	*	GetNext() {
+    inline	CRunningScript	*	 GetNext() {
         return Next;
     }
-    inline	CRunningScript	*	GetPrev() {
+    inline	CRunningScript	*	 GetPrev() {
         return Previous;
     }
-    inline	void				SetIsExternal(bool b) {
+    inline	void				 SetIsExternal(bool b) {
         bIsExternal = b;
     }
-    inline	void				SetActive(bool b) {
+    inline	void				 SetActive(bool b) {
         bIsActive = b;
     }
-    inline	void				SetNext(CRunningScript *v) {
+    inline	void				 SetNext(CRunningScript *v) {
         Next = v;
     }
-    inline	void				SetPrev(CRunningScript *v) {
+    inline	void				 SetPrev(CRunningScript *v) {
         Previous = v;
     }
-    inline	SCRIPT_VAR		*	GetVarPtr() {
+    inline	SCRIPT_VAR		*	 GetVarPtr() {
         return LocalVar;
     }
-    inline	SCRIPT_VAR		*	GetVarPtr(int i) {
+    inline	SCRIPT_VAR		*	 GetVarPtr(int i) {
         return &LocalVar[i];
     }
-    inline	int				*	GetIntVarPtr(int i) {
+    inline	int				*	 GetIntVarPtr(int i) {
         return (int*)&LocalVar[i].dwParam;
     }
-    inline	int					GetIntVar(int i) {
+    inline	int					 GetIntVar(int i) {
         return LocalVar[i].dwParam;
     }
-    inline	void				SetIntVar(int i, int v) {
+    inline	void				 SetIntVar(int i, int v) {
         LocalVar[i].dwParam = v;
     }
-    inline	void				SetFloatVar(int i, float v) {
+    inline	void				 SetFloatVar(int i, float v) {
         LocalVar[i].fParam = v;
     }
-    inline	char				GetByteVar(int i) {
+    inline	char				 GetByteVar(int i) {
         return LocalVar[i].bParam;
     }
-    inline	bool				GetConditionResult() {
+    inline	bool				 GetConditionResult() {
         return bCondResult != 0;
     }
     /*
@@ -137,22 +136,22 @@ public:
     return IsMission() ? CTheScripts::GetMissionLocalPtr(i) : GetIntVarPtr(i);
     }*/
 
-    inline	char			ReadDataType() {
+    inline	char			 ReadDataType() {
         return ReadDataByte();
     }
-    inline	short		ReadDataVarIndex() {
+    inline	short		 ReadDataVarIndex() {
         return ReadDataWord();
     }
-    inline	short		ReadDataArrayOffset() {
+    inline	short		 ReadDataArrayOffset() {
         return ReadDataWord();
     }
-    inline	short		ReadDataArrayIndex() {
+    inline	short		 ReadDataArrayIndex() {
         return ReadDataWord();
     }
-    inline	short		ReadDataArraySize() {
+    inline	short		 ReadDataArraySize() {
         return ReadDataByte();
     }
-    inline	short		ReadDataArrayFlags() {
+    inline	short		 ReadDataArrayFlags() {
         return ReadDataByte();
     }
     /*
@@ -190,37 +189,37 @@ public:
     return GetLocalVarVal(indexVal + offset);
     };*/
 
-    inline	void		IncPtr(int n = 1) {
+    inline	void		 IncPtr(int n = 1) {
         CurrentIP += n;
     };
 
-    inline	int			ReadDataByte()
+    inline	int			  ReadDataByte()
     {
         char b = *CurrentIP;
         ++CurrentIP;
         return b;
     };
 
-    inline	short		ReadDataWord()
+    inline	short		 ReadDataWord()
     {
         short v = *(short*)CurrentIP;
         CurrentIP += 2;
         return v;
     };
 
-    inline	int			ReadDataInt()
+    inline	int			 ReadDataInt()
     {
         int i = *(int*)CurrentIP;
         CurrentIP += 4;
         return i;
     };
 
-    inline void			PushStack(BYTE *ptr)
+    inline void			 PushStack(BYTE *ptr)
     {
         Stack[SP++] = ptr;
     }
 
-    inline BYTE	*		PopStack()
+    inline BYTE	*		 PopStack()
     {
         return Stack[--SP];
     }

@@ -3,8 +3,8 @@ from utils import FileEx
 
 ref_str = "extended,00"
 
-old_address = 0x35C830
-new_address = 0x35CDB0
+old_address = 0x35CED4
+new_address = 0x35CF2C
 
 with io.open("pnach.txt", mode="r") as src:
     exsrc = FileEx(src)
