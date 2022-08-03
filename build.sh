@@ -1,7 +1,13 @@
 #!/bin/bash
 
 cd src
-mips64r5900el-ps2-elf-g++ -nostartfiles -nostdlib -Wl,\
+mips64r5900el-ps2-elf-g++ -nostartfiles -nostdlib \
+-fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
+-fno-builtin-printf -fno-builtin-strcat -fno-builtin-strchr \
+-fno-builtin-strcmp -fno-builtin-strcpy -fno-builtin-strlen \
+-fno-builtin-strncpy -fno-builtin-strrchr -fno-builtin-strncmp \
+-fno-builtin-malloc -fno-builtin-free \
+-Wl,\
 --section-start=.opcodeparams=0x6FDFB0,\
 --section-start=.setparams=0x1F7D20,\
 --section-start=.getparams=0x1F77D0,\

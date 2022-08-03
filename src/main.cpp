@@ -24,6 +24,26 @@ typedef uint16_t WORD;
 typedef uint32_t DWORD;
 typedef uint64_t QWORD;
 
+typedef int FILE;
+
+FILE* (*rw_open)(const char*, const char*) __attribute__((section(".data"))) = (FILE* (*)(const char*, const char*))0x00233210;
+size_t (*rw_read)(FILE *, void *, size_t) __attribute__((section(".data"))) = (size_t (*)(FILE *, void *, size_t))0x00233250;
+int (*rw_seek)(FILE *, long int, int) __attribute__((section(".data"))) = (int (*)(FILE *, long int, int))0x002332B0;
+int (*rw_close)(FILE *) __attribute__((section(".data"))) = (int (*)(FILE *))0x00233370;
+
+int (*printf)(const char *, ...) __attribute__((section(".data")))  = (int (*)(const char *, ...))0x0054F7D0;
+
+void* (*malloc)(size_t) __attribute__((section(".data")))  = (void* (*)(size_t))0x00337010;
+void (*free)(void*) __attribute__((section(".data")))  = (void (*)(void*))0x0054D838;
+void* (*memset)(void *, int, size_t) __attribute__((section(".data")))  = (void* (*)(void *, int, size_t))0x0054E568;
+void* (*memcpy)(void *, const void *, size_t) __attribute__((section(".data")))  = (void* (*)(void *, const void *, size_t))0x0054E3B0;
+int (*memcmp)(const void *, const void *, size_t) __attribute__((section(".data")))  = (int (*)(const void *, const void *, size_t))0x0054E318;
+
+size_t (*strlen)(const char *) __attribute__((section(".data")))  = (size_t (*)(const char *))0x005517B8;
+int (*strcmp)(const char *, const char *) __attribute__((section(".data")))  = (int (*)(const char *, const char *))0x00551558;
+char* (*strcpy)(char *, const char *) __attribute__((section(".data")))  = (char* (*)(char *, const char *))0x005516A0;
+char* (*strcat)(char *, const char *) __attribute__((section(".data")))  = (char* (*)(char *, const char *))0x00551298;
+
 #include "CTheScripts.h"
 
 int  __attribute__((section(".GetPedStruct"))) GetPedStruct(DWORD *a1, int a2) {return 0;}
@@ -46,6 +66,21 @@ void __attribute__((section("._ZN11CTheScripts31ReinitialiseSwitchStatementDataE
 int _StyledText_2[2] __attribute__((section(".style2")));
 size_t CTheScripts_CommandsExecuted  __attribute__((section(".CTheScripts_CommandsExecuted")));
 int __attribute__((section(".opcodeTable"))) (*opcodeHandlerTable[100])(CRunningScript* thread, int opcode);
+
+void(*SetScriptCondResult)(CRunningScript *, bool) __attribute__((section(".data"))) = (void(*)(CRunningScript *, bool))0x003077F0;
+
+void (*PrintBig)(const char *, int, uint16_t) __attribute__((section(".data"))) = (void (*)(const char *, int, uint16_t))0x0018BCD0;
+void (*Print)(const char *src, int, bool, bool) __attribute__((section(".data"))) = (void (*)(const char *src, int, bool, bool))0x0018B570;
+void (*PrintNow)(const char *src, int, bool, bool) __attribute__((section(".data"))) = (void (*)(const char *src, int, bool, bool))0x0018B8B0;
+
+int (*GetPedHandle)(DWORD *, int) __attribute__((section(".data"))) = (int (*)(DWORD *, int))0x0019FA20;
+int (*GetVehHandle)(DWORD *, int) __attribute__((section(".data"))) = (int (*)(DWORD *, int))0x0017EF20;
+int (*GetObjHandle)(DWORD *, int) __attribute__((section(".data"))) = (int (*)(DWORD *, int))0x00132CC0;
+
+const char* (*CText_Get)(DWORD, const char*) __attribute__((section(".data"))) = (const char* (*)(DWORD, const char*))0x0018ED90;
+
+DWORD gameTexts __attribute__((section(".data")))  = 0x0069F290;
+char message_buf[0x80];
 
 /************************************************************************/
 /*					CRunningScript::Process hook						*/
@@ -120,7 +155,7 @@ inline SCRIPT_VAR*  __attribute__((section(".getparamptr"))) GetScriptParamPoint
 /*						CLEO New functions								*/
 /************************************************************************/
 
-inline void   SkipUnusedParameters(CRunningScript *thread)
+inline void SkipUnusedParameters(CRunningScript *thread)
 {
 	while (*thread->GetBytePointer()) GetScriptParams(thread, 1);	// skip parameters
 	thread->ReadDataByte();
@@ -130,6 +165,8 @@ inline void ThreadJump(CRunningScript *thread, int off)
 {
 	thread->SetIp(off < 0 ? thread->GetBasePointer() - off : (BYTE*)CTheScripts_ScriptSpace + off);
 }
+
+
 
 // a pointer automatically convertible to integral types
 union memory_pointer
@@ -161,6 +198,8 @@ enum OpcodeResult : int
 
 typedef OpcodeResult(* CustomOpcodeHandler)(CRunningScript*);
 
+OpcodeResult opcode_defa(CRunningScript *thread);
+
 OpcodeResult opcode_0A8C(CRunningScript *thread);
 OpcodeResult opcode_0A8D(CRunningScript *thread);
 OpcodeResult opcode_0A8E(CRunningScript *thread);
@@ -170,6 +209,10 @@ OpcodeResult opcode_0A91(CRunningScript *thread);
 OpcodeResult opcode_0A96(CRunningScript *thread);
 OpcodeResult opcode_0A97(CRunningScript *thread);
 OpcodeResult opcode_0A98(CRunningScript *thread);
+OpcodeResult opcode_0A9A(CRunningScript *thread);
+OpcodeResult opcode_0A9B(CRunningScript *thread);
+OpcodeResult opcode_0A9C(CRunningScript *thread);
+OpcodeResult opcode_0A9D(CRunningScript *thread);
 OpcodeResult opcode_0A9F(CRunningScript *thread);
 OpcodeResult opcode_0AA0(CRunningScript *thread);
 OpcodeResult opcode_0AA1(CRunningScript *thread);
@@ -179,17 +222,29 @@ OpcodeResult opcode_0AA7(CRunningScript *thread);
 OpcodeResult opcode_0AA8(CRunningScript *thread);
 OpcodeResult opcode_0AC6(CRunningScript *thread);
 OpcodeResult opcode_0AC7(CRunningScript *thread);
+OpcodeResult opcode_0AC8(CRunningScript *thread);
+OpcodeResult opcode_0AC9(CRunningScript *thread);
 OpcodeResult opcode_0ACA(CRunningScript *thread);
+OpcodeResult opcode_0ACB(CRunningScript *thread);
+OpcodeResult opcode_0ACC(CRunningScript *thread);
+OpcodeResult opcode_0ACD(CRunningScript *thread);
 OpcodeResult opcode_0ACE(CRunningScript *thread);
+OpcodeResult opcode_0ACF(CRunningScript *thread);
+OpcodeResult opcode_0AD0(CRunningScript *thread);
+OpcodeResult opcode_0AD1(CRunningScript *thread);
 OpcodeResult opcode_0AD3(CRunningScript *thread);
-OpcodeResult opcode_defa(CRunningScript *thread);
+OpcodeResult opcode_0AD5(CRunningScript *thread);
+OpcodeResult opcode_0ADE(CRunningScript* thread);
+OpcodeResult opcode_0AEA(CRunningScript *thread);
+OpcodeResult opcode_0AEB(CRunningScript *thread);
+OpcodeResult opcode_0AEC(CRunningScript *thread);
 
-CustomOpcodeHandler   customOpcodeHandlers[100] =
+CustomOpcodeHandler customOpcodeHandlers[100] =
 {
 	opcode_0A8C, opcode_0A8D, opcode_0A8E, opcode_0A8F, opcode_0A90,
 	opcode_0A91, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
-	opcode_0A96, opcode_0A97, opcode_0A98, opcode_defa, opcode_defa,
-	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_0A9F,
+	opcode_0A96, opcode_0A97, opcode_0A98, opcode_defa, opcode_0A9A,
+	opcode_0A9B, opcode_0A9C, opcode_0A9D, opcode_defa, opcode_0A9F,
 	opcode_0AA0, opcode_0AA1, opcode_defa, opcode_defa, opcode_defa,
 	opcode_0AA5, opcode_0AA6, opcode_0AA7, opcode_0AA8, opcode_defa,
 	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
@@ -198,14 +253,14 @@ CustomOpcodeHandler   customOpcodeHandlers[100] =
 	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
 	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
 	opcode_defa, opcode_defa, opcode_defa, opcode_0AC6, opcode_0AC7,
-	opcode_defa, opcode_defa, opcode_0ACA, opcode_defa, opcode_defa,
-	opcode_defa, opcode_0ACE, opcode_defa, opcode_defa, opcode_defa,
-	opcode_defa, opcode_0AD3, opcode_defa, opcode_defa, opcode_defa,
+	opcode_0AC8, opcode_0AC9, opcode_0ACA, opcode_0ACB, opcode_0ACC,
+	opcode_0ACD, opcode_0ACE, opcode_0ACF, opcode_0AD0, opcode_0AD1,
+	opcode_defa, opcode_0AD3, opcode_defa, opcode_0AD5, opcode_defa,
 	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
+	opcode_defa, opcode_defa, opcode_0ADE, opcode_defa, opcode_defa,
 	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
-	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
-	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
-	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_defa,
+	opcode_defa, opcode_defa, opcode_defa, opcode_defa, opcode_0AEA,
+	opcode_0AEB, opcode_0AEC, opcode_defa, opcode_defa, opcode_defa,
 };
 
 typedef OpcodeResult(*_OpcodeHandler)(CRunningScript *thread, unsigned short opcode);
@@ -483,7 +538,7 @@ int  format(CRunningScript *thread, char *str, size_t len, const char *format)
 }
 
 // opcode handler for custom opcodes
-OpcodeResult  customOpcodeHandler(CRunningScript *thread, unsigned short opcode)
+OpcodeResult customOpcodeHandler(CRunningScript *thread, unsigned short opcode)
 {
 	return customOpcodeHandlers[opcode - 0x0A8C](thread);
 }
@@ -492,13 +547,13 @@ OpcodeResult  customOpcodeHandler(CRunningScript *thread, unsigned short opcode)
 /*						Opcode definitions								*/
 /************************************************************************/
 
-OpcodeResult   opcode_defa(CRunningScript *thread)
+OpcodeResult opcode_defa(CRunningScript *thread)
 {
-	return OR_CONTINUE;
+	return (OpcodeResult)-1;
 }
 
 //0A8C=3,write_memory %1d% size %2d% value %3d%
-OpcodeResult   opcode_0A8C(CRunningScript *thread)
+OpcodeResult opcode_0A8C(CRunningScript *thread)
 {
 	GetScriptParams(thread, 3);
 	DWORD *Address = (DWORD*)opcodeParams[0].pParam;
@@ -570,7 +625,7 @@ OpcodeResult   opcode_0A90(CRunningScript *thread)
 	return OR_CONTINUE;
 }
 
-//0A90=3,%3d% = %1d% / %2d% ; int
+//0A91=3,%3d% = %1d% / %2d% ; int
 OpcodeResult   opcode_0A91(CRunningScript *thread)
 {
 	GetScriptParams(thread, 2);
@@ -606,8 +661,65 @@ OpcodeResult   opcode_0A98(CRunningScript *thread)
 	return OR_CONTINUE;
 }
 
+//0A9A=3,%3d% = openfile %1d% mode %2d% // IF and SET
+OpcodeResult opcode_0A9A(CRunningScript *thread)
+{
+	const char *fname = readString(thread);
+	char mode[0x10];
+
+	// string param
+	GetScriptStringParam(thread, mode, sizeof(mode));
+
+	if (auto hfile = rw_open(fname, mode))
+	{
+		//GetInstance().OpcodeSystem.m_hFiles.insert(hfile);
+		*thread << hfile;
+		SetScriptCondResult(thread, true);
+	}
+	else
+	{
+		*thread << NULL;
+		SetScriptCondResult(thread, false);
+	}
+	return OR_CONTINUE;
+}
+
+//0A9B=1,closefile %1d%
+OpcodeResult opcode_0A9B(CRunningScript *thread)
+{
+	DWORD hFile;
+	*thread >> hFile;
+	rw_close((FILE*)hFile);
+	//GetInstance().OpcodeSystem.m_hFiles.erase(hFile);
+	return OR_CONTINUE;
+}
+
+//0A9C=2,%2d% = file %1d% size
+OpcodeResult opcode_0A9C(CRunningScript *thread)
+{
+	
+	//DWORD hFile;
+	//*thread >> hFile;
+	//*thread << file_get_size(hFile);
+	SkipUnusedParameters(thread);
+	return OR_CONTINUE;
+}
+
+//0A9D=3,readfile %1d% size %2d% to %3d%
+OpcodeResult opcode_0A9D(CRunningScript *thread)
+{
+	DWORD hFile;
+	DWORD size;
+	void *buf;
+	*thread >> hFile >> size;
+	buf = GetScriptParamPointer(thread, 1);
+	rw_read((FILE*)hFile, buf, size);
+	return OR_CONTINUE;
+}
+
+
 //0A9F=1,%1d% = current_thread_pointer
-OpcodeResult   opcode_0A9F(CRunningScript *thread)
+OpcodeResult opcode_0A9F(CRunningScript *thread)
 {
 	opcodeParams[0].dwParam = (int)thread;
 	SetScriptParams(thread, 1);
@@ -633,12 +745,12 @@ OpcodeResult opcode_0AA1(CRunningScript *thread)
 	return OR_CONTINUE;
 }
 
-static char textParams[5][128]   ;
+static char textParams[2][128];
 static unsigned char currTextParam   = 0;
 static SCRIPT_VAR arguments[15] = { 0 };
 
 //0AA5=-1,call_function %1d% num_params %2h% pop %3h%
-OpcodeResult   opcode_0AA5(CRunningScript *thread)
+OpcodeResult opcode_0AA5(CRunningScript *thread)
 {
 	void(*func)(SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, 
 				SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, 
@@ -740,7 +852,7 @@ OpcodeResult   opcode_0AA5(CRunningScript *thread)
 }
 
 //0AA6=-1,call_method %1d% struct %2d% num_params %3h% pop %4h%
-OpcodeResult   opcode_0AA6(CRunningScript *thread)
+OpcodeResult opcode_0AA6(CRunningScript *thread)
 {
 
 	void(*func)(void*, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, 
@@ -951,7 +1063,7 @@ OpcodeResult opcode_0AA7(CRunningScript *thread)
 }
 
 //0AA8=-1,call_method_return %1d% struct %2d% num_params %3h% pop %4h%
-OpcodeResult   opcode_0AA8(CRunningScript *thread)
+OpcodeResult opcode_0AA8(CRunningScript *thread)
 {
 	DWORD (*func)(void*, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, 
 			SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, SCRIPT_VAR, 
@@ -1069,13 +1181,73 @@ OpcodeResult opcode_0AC7(CRunningScript *thread)
 	return OR_CONTINUE;
 }
 
+//0AC8=2,%2d% = allocate_memory_size %1d%
+OpcodeResult opcode_0AC8(CRunningScript *thread)
+{
+	DWORD size;
+	*thread >> size;
+	void *mem = malloc(size);
+	//if (mem) GetInstance().OpcodeSystem.m_pAllocations.insert(mem);
+	*thread << mem;
+	SetScriptCondResult(thread, mem != nullptr);
+	return OR_CONTINUE;
+}
+
+//0AC9=1,free_allocated_memory %1d%
+OpcodeResult opcode_0AC9(CRunningScript *thread)
+{
+	void *mem;
+	*thread >> mem;
+	//auto & allocs = GetInstance().OpcodeSystem.m_pAllocations;
+	//if (allocs.find(mem) != allocs.end())
+	//{
+		free(mem);
+	//	allocs.erase(mem);
+	//}
+	return OR_CONTINUE;
+}
+
 //0ACA=1,show_text_box %1s%
-OpcodeResult   opcode_0ACA(CRunningScript *thread)
+OpcodeResult opcode_0ACA(CRunningScript *thread)
 {	
 	PrintHelp(readString(thread), 0, 0, 0);
 	return OR_CONTINUE;
 }
 
+//0ACB=3,show_styled_text %1d% time %2d% style %3d%
+OpcodeResult opcode_0ACB(CRunningScript *thread)
+{
+	const char *text = readString(thread);
+	DWORD time, style;
+	*thread >> time >> style;
+	strcpy(message_buf, text);
+	PrintBig(message_buf, time, style-1);
+	return OR_CONTINUE;
+}
+
+//0ACC=2,show_text_lowpriority %1d% time %2d%
+OpcodeResult opcode_0ACC(CRunningScript *thread)
+{
+	const char *text = readString(thread);
+	DWORD time;
+	*thread >> time;
+	strcpy(message_buf, text);
+	Print(message_buf, time, false, false);
+	return OR_CONTINUE;
+}
+
+//0ACD=2,show_text_highpriority %1d% time %2d%
+OpcodeResult opcode_0ACD(CRunningScript *thread)
+{
+	const char *text = readString(thread);
+	DWORD time;
+	*thread >> time;
+	strcpy(message_buf, text);
+	PrintNow(message_buf, time, false, false);
+	return OR_CONTINUE;
+}
+
+//0ACE=-1,show_formatted_text_box %1d%
 OpcodeResult opcode_0ACE(CRunningScript *thread)
 {
 	char fmt[128];
@@ -1087,8 +1259,51 @@ OpcodeResult opcode_0ACE(CRunningScript *thread)
 	return OR_CONTINUE;
 }
 
+
+//0ACF=-1,show_formatted_styled_text %1d% time %2d% style %3d%
+OpcodeResult opcode_0ACF(CRunningScript *thread)
+{
+	char fmt[128]; char text[128];
+	DWORD time, style;
+	readString(thread, fmt, sizeof(fmt));
+	*thread >> time >> style;
+	format(thread, text, sizeof(text), fmt);
+	strcpy(message_buf, text);
+	PrintBig(message_buf, time, style-1);
+	SkipUnusedParameters(thread);
+	return OR_CONTINUE;
+}
+
+//0AD0=-1,show_formatted_text_lowpriority %1d% time %2d%
+OpcodeResult opcode_0AD0(CRunningScript *thread)
+{
+	char fmt[128]; char text[128];
+	DWORD time;
+	readString(thread, fmt, sizeof(fmt));
+	*thread >> time;
+	format(thread, text, sizeof(text), fmt);
+	strcpy(message_buf, text);
+	Print(message_buf, time, false, false);
+	SkipUnusedParameters(thread);
+	return OR_CONTINUE;
+}
+
+//0AD1=-1,show_formatted_text_highpriority %1d% time %2d%
+OpcodeResult opcode_0AD1(CRunningScript *thread)
+{
+	char fmt[128]; char text[128];
+	DWORD time;
+	readString(thread, fmt, sizeof(fmt));
+	*thread >> time;
+	format(thread, text, sizeof(text), fmt);
+	strcpy(message_buf, text);
+	PrintNow(message_buf, time, false, false);
+	SkipUnusedParameters(thread);
+	return OR_CONTINUE;
+}
+
 //0AD3=-1,%1d% = string_format %2s%
-OpcodeResult   opcode_0AD3(CRunningScript *thread)
+OpcodeResult opcode_0AD3(CRunningScript *thread)
 {
 	char fmt[128], *dst;
 
@@ -1098,5 +1313,53 @@ OpcodeResult   opcode_0AD3(CRunningScript *thread)
 	readString(thread, fmt, sizeof(fmt));
 	format(thread, dst, -1, fmt);
 	SkipUnusedParameters(thread);
+	return OR_CONTINUE;
+}
+
+//0AD5=3,file %1d% seek %2d% from_origin %3d% //IF and SET
+OpcodeResult opcode_0AD5(CRunningScript *thread)
+{
+	DWORD hFile;
+	int seek, origin;
+	*thread >> hFile >> seek >> origin;
+	SetScriptCondResult(thread, rw_seek((FILE*)hFile, seek, origin) == 0);
+	return OR_CONTINUE;
+}
+
+//0ADE=2,%2d% = text_by_GXT_entry %1d%
+OpcodeResult opcode_0ADE(CRunningScript *thread)
+{
+	const char *gxt = readString(thread);
+	if (*thread->GetBytePointer() >= 1 && *thread->GetBytePointer() <= 8)
+		*thread << CText_Get(gameTexts, gxt);
+	else
+		strcpy((char *)GetScriptParamPointer(thread, 1), CText_Get(gameTexts, gxt));
+	return OR_CONTINUE;
+}
+
+//0AEA=2,%2d% = actor_struct %1d% handle
+OpcodeResult opcode_0AEA(CRunningScript *thread)
+{
+	DWORD struc;
+	*thread >> struc;
+	*thread << GetPedHandle(pedPool, struc);
+	return OR_CONTINUE;
+}
+
+//0AEB=2,%2d% = car_struct %1d% handle
+OpcodeResult opcode_0AEB(CRunningScript *thread)
+{
+	DWORD struc;
+	*thread >> struc;
+	*thread << GetVehHandle(vehPool, struc);
+	return OR_CONTINUE;
+}
+
+//0AEC=2,%2d% = object_struct %1d% handle
+OpcodeResult opcode_0AEC(CRunningScript *thread)
+{
+	DWORD struc;
+	*thread >> struc;
+	*thread << GetObjHandle(objPool, struc);
 	return OR_CONTINUE;
 }
