@@ -120,5 +120,5 @@ Project Link: [PS2 CLEO](https://github.com/DanielSant0s/PS2-CLEO)
 Here are some direct and indirect thanks to the people who made the project viable!
 
 * All CLEO project and plugins contributors(specially Seemann and Junior_Djjr)
-* aap - Assembly tips XD
+* aap and Fobes- Assembly and error tracking tips
 
