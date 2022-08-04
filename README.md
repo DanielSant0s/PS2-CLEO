@@ -46,9 +46,13 @@ Using Enceladus you only need one way to code and one way to test your code, tha
 
 [Sanny Builder](https://sannybuilder.com/downloads.html)(With our custom data) and [PCSX2](https://pcsx2.net/download/development/dev-windows.html) or OPL on a real console.
 
-Get ISO US v1.03 somewhere(as it is the only version compatible with the project), enable cheats on PCSX2, rename project file from cleo.s to CRC32 of your game + .pnach(Note: The code of a vanilla ISO is 399A49CA, so it would be 399A49CA.pnach) and throw it in the cheats folder of your emulator. To inject directly into the ISO, split the patch into 5 or 6 files (as it is too big to process) and install to the ISO using PS2 Patch Engine. Once that's done, you can start coding in main.scm.
-
 Oh, and I also have to mention that an essential prerequisite for using CLEO is knowing how to code in Sanny Builder.  
+
+Yes, this shit works, I rewrote the entire CRunningScript::Process function to work similarly to the PC version of the game and in addition to make the game's scripting system a little lighter and support new opcodes, I programmed the project almost all in C++ (some parts in Assembly) and I made a tremendous scheme to turn this into 5 patches (I had to divide it into 5 because only one broke the size limits of all PS2 patch programs, so to apply by yourself, you will have to make 5 patches xD But no, don't despair, it includes a SLUS_209.46 (executable from the game) with CLEO pre-installed.
+
+It also includes a sb_data.7z for Sanny Builder, to be able to code using the program, to be able to use it, just extract the files in the Sanny Builder folder (in its latest version, of course), then change the mode in the lower right corner of the window to "GTA SA PS2 v1.0" and finally select the installation of the PC version of the game in the options menu (yes, the PC version, remember to have it installed). Finally I also included an .iso image with a test kit that I used to develop the project and also a clean main.scm source with just some example opcodes.
+
+<h1 align="center"><a href="https://drive.google.com/drive/u/0/folders/1HZePaZbU82iLNJPZr00fQNFUbNE4WRHk">DOWNLOAD</a></h1>
 
 ## Opcodes  
 * 0A8C: write_memory 0xC0BC15 size 1 value 1 virtual_protect 0
