@@ -86,13 +86,22 @@ char message_buf[0x80];
 /*					CRunningScript::Process hook						*/
 /************************************************************************/
 
-void __attribute__((section("._ZN14CRunningScript7ProcessEv"))) CRunningScript_Process(CRunningScript *thread)
+const char act_ptr[] __attribute__((section(".debugtex"))) = "CRunningScript::Proccess - CurrentIP pointer: 0x%x - Opcode: %04x\n";
+
+int __attribute__((section("._ZN14CRunningScript7ProcessEv"))) CRunningScript_Process(CRunningScript *thread)
 {
+
+	asm __volatile__ (
+	"sq      $s0, 0x50($sp)    \n"
+	: : :
+	);
+
     void *v2; // eax
     bool v3; // zf
-    uint16_t v4; // ax
-    WORD *v5; // ecx
-    unsigned int v6; // eax
+    WORD v4; // ax
+    BYTE *v5; // ecx
+    WORD opcode; // eax
+	int* CommandsExecuted = (int*)0x66B53C;
 
     if ( thread->SceneSkipIP && CCutsceneMgr_IsCutsceneSkipButtonBeingPressed() )
     {
@@ -101,7 +110,7 @@ void __attribute__((section("._ZN14CRunningScript7ProcessEv"))) CRunningScript_P
         if ( (int)v2 >= 0 )
             thread->CurrentIP = (BYTE*)&CTheScripts_ScriptSpace + (DWORD)v2;
         else
-            thread->CurrentIP = (BYTE*)(thread->BaseIP - (DWORD)v2);
+            thread->CurrentIP = (BYTE*)((DWORD)thread->BaseIP - (DWORD)v2);
         thread->SceneSkipIP = 0;
         thread->WakeTime = 0;
     }
@@ -128,17 +137,40 @@ void __attribute__((section("._ZN14CRunningScript7ProcessEv"))) CRunningScript_P
     CTheScripts_ReinitialiseSwitchStatementData();
     if ( CTimer_m_snTimeInMilliseconds >= thread->WakeTime )
     {
+		
         do
         {
-            ++CTheScripts_CommandsExecuted;
-            v5 = (WORD*)thread->CurrentIP;
-            v6 = (WORD)*v5;
-            thread->CurrentIP = (BYTE*)(v5 + 1);
-            thread->NotFlag = (v6 & 0x8000) != 0;
+			++*CommandsExecuted;
+            v5 = thread->CurrentIP;
+
+			uint32_t align_diff = (DWORD)v5 % 4;
+			DWORD aligned_addr = (DWORD)v5;
+
+			if(align_diff > 0){
+				aligned_addr = ((DWORD)aligned_addr - align_diff);
+				opcode = (WORD)(*(uint32_t*)(aligned_addr) >> (8*align_diff));
+				opcode += (WORD)(*(uint32_t*)(aligned_addr+4) << (8*(4-align_diff)));
+			} else {
+				opcode = *(WORD*)v5;
+			}
+
+			//printf(act_ptr, v5, opcode);
+
+            thread->CurrentIP = (BYTE*)(v5 + 2);
+            thread->NotFlag = (opcode & 0x8000) != 0;
         }
-        while ( !opcodeHandlerTable[(int16_t)(v6 & 0x7FFF) / 100](thread, v6 & 0x7FFF) );
+        while ( !opcodeHandlerTable[opcode / 100](thread, opcode) );
     }
+
+	asm __volatile__ (
+	"lq      $s0, 0x50($sp)    \n"
+	: : :
+	);
+
+	return 0;
 }
+
+
 
 /************************************************************************/
 /*						CRunningScript wrappers							*/

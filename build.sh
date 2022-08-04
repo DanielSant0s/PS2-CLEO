@@ -8,6 +8,7 @@ mips64r5900el-ps2-elf-g++ -nostartfiles -nostdlib \
 -fno-builtin-strncpy -fno-builtin-strrchr -fno-builtin-strncmp \
 -fno-builtin-malloc -fno-builtin-free \
 -Wl,\
+--section-start=.debugtex=0x1FAAF0,\
 --section-start=.opcodeparams=0x6FDFB0,\
 --section-start=.setparams=0x1F7D20,\
 --section-start=.getparams=0x1F77D0,\
@@ -29,6 +30,7 @@ mips64r5900el-ps2-elf-g++ -nostartfiles -nostdlib \
 --section-start=._ZN11CTheScripts11ScriptSpaceE=0x6B1FF0,\
 --section-start=._ZN12CCutsceneMgr32IsCutsceneSkipButtonBeingPressedEv=0x304860,\
 --section-start=._ZN14CRunningScript7ProcessEv=0x1FA720,\
+--section-start=.ProcessOneCommand=0x1FA91C,\
 --section-start=.opcodeTable=0x5F91C0,\
 --section-start=.GetPedStruct=0x1FFBB0,\
 --section-start=.pedPool=0x66B918,\
