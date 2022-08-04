@@ -102,7 +102,7 @@ Contributions are what make the open source community such an amazing place to b
 
 ## License
 
-Distributed under GNU GPL-3.0 License. See `LICENSE` for more information.
+Distributed under MIT License. See `LICENSE` for more information.
 
 <!-- CONTACT -->
 ## Contact
