@@ -51,20 +51,44 @@ Get ISO US v1.03 somewhere(as it is the only version compatible with the project
 Oh, and I also have to mention that an essential prerequisite for using CLEO is knowing how to code in Sanny Builder.  
 
 ## Opcodes  
-* 003d:  0@ = read_memory 0x60464C
-* 003e:  write_memory 0x60464C 32
-* 003F:  call_function 0x59E480 arg_num 1 ret 0 args #BANDITO  
-P.S.1: It has in-built return, just changed by a flag returning on the var in the last argument  
-P.S.2: Argument order is the same as C calling, (Original CLEO is inverted)  
-
-* 0040: call_method 0x21A920 struct 0x6FE530 arg_num 1 ret 0 args 0 //CCamera::Fade(short)  
-P.S.: Call method works just like call function, with a return flag  
-
-* 0047:  1@ = ped 0@ struct
-* 0048:  1@ = vehicle 0@ struct
-* 0049:  1@ = object 0@ struct
-* 004A:  0@ = get_this_script_struct
-* 004B:  1@ = var 0@ pointer
+* 0A8C: write_memory 0xC0BC15 size 1 value 1 virtual_protect 0
+* 0A8D: $result = read_memory 1@ size 4 virtual_protect 0
+* 0A8E: 4@ = 5@ + 6@ // int
+* 0A8F: $var = 0@(1@,2i) - 1 // int
+* 0A90: $var(0@,10i) = 100 * 1@ // int
+* 0A91: $div = 1 / 5 // int
+* 0A96: $ActorStruct = ped $PLAYER_ACTOR struct
+* 0A97: $CarStruct = vehicle $MyCar struct
+* 0A98: $ObjectStruct = object 0@ struct
+* 0A9A: $hFILE = open_file "settings.ini" mode 0x72  // IF and SET
+* 0A9B: close_file $hFILE
+* 0A9C: 0@ = file $hFILE size //DON'T USE
+* 0A9D: read_file $hFILE size 2 to $150
+* 0A9F: 0@ = get_this_script_struct
+* 0AA0: gosub_if_false @CREATE_NEW_ACTOR
+* 0AA1: return_if_false
+* 0AA5: call_function $hPROC num_params 1 pop 1 $param
+* 0AA6: call_method $Destroy struct $CarStruct num_params 0 pop 0
+* 0AA7: call_function_return 0x569660 num_params 2 pop 2 $COORD_Y $COORD_X $GROUND
+* 0AA8: call_method_return 0x4048E0 struct 0xB74494 num_params 1 pop 0 $MyCar 0@
+* 0AC6: 0@ = label @label pointer
+* 0AC7: 0@ = var 0@ pointer
+* 0AC8: 0@ = allocate_memory_size 260
+* 0AC9: free_allocated_memory 0@
+* 0ACA: show_text_box 0@v
+* 0ACB: show_styled_text 0@v time 1000 style 1
+* 0ACC: show_text_lowpriority 0x969110 time 100
+* 0ACD: show_text_highpriority 0x969110 time 100
+* 0ACE: show_formatted_text_box "This is %.4X opcode" 0x0ACE
+* 0ACF: show_formatted_styled_text "This is %.4X opcode" time 2000 style 1 0x0ACF
+* 0AD0: show_formatted_text_lowpriority "This is %.4X opcode" time 2000 0x0AD0
+* 0AD1: show_formatted_text_highpriority "This is %.4X opcode" time 2000 0x0AD1
+* 0AD3: 0@v = string_format "%d + %d = %d" 2 2 4
+* 0AD5: file $hFile seek 0x10 from_origin 1 //IF and SET
+* 0ADE: 0@ = text_label_string 0@v
+* 0AEA: $actor = ped_struct $ped_struct handle
+* 0AEB: $car = vehicle_struct $vehicle_struct handle
+* 0AEC: $object = object_struct $object_struct handle
 
 ## Contributing
 
