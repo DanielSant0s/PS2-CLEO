@@ -11,7 +11,7 @@
 */
 
 SECTIONS {
-	.text 0x0035C7E8: {
+	.text 0x00100000: {
 		*(.text)
 		*(.text.*)
 		QUAD(0)
