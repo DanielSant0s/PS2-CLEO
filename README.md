@@ -42,7 +42,7 @@ In this section you will have some information about how to code using this proj
 
 ### Setup
 
-Using Enceladus you only need one way to code and one way to test your code, that is, if you want, you can even create your code on PS2, but I'll leave some recommendations below.
+Using CLEO you only need one way to code and one way to test your code, I'll leave some recommendations below.
 
 [Sanny Builder](https://sannybuilder.com/downloads.html)(With our custom data) and [PCSX2](https://pcsx2.net/download/development/dev-windows.html) or OPL on a real console.
 
