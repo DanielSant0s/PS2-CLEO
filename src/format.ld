@@ -10,53 +10,22 @@
 # Linkfile script for ee-ld
 */
 
-ENTRY(__start);
-
-PHDRS {
-  text PT_LOAD;
-}
-
 SECTIONS {
 	.text 0x0035C7E8: {
 		*(.text)
 		*(.text.*)
+		QUAD(0)
 		*(.gnu.linkonce.t*)
 		*(.rodata)
 		*(.rodata.*)
 		*(.gnu.linkonce.r*)
-		_fdata = . ;
 		*(.data)
 		*(.data.*)
 		*(.gnu.linkonce.d*)
 		*(.rdata)
-		*(.bss)
-		*(.bss.*)
-		*(.gnu.linkonce.b*)
-		*(COMMON)
-		QUAD(0)
-	} :text
-
-	.gcc_except_table ALIGN(128): { *(.gcc_except_table) }
+		*(.gcc_except_table)
+	}
 
 	_gp = ALIGN(128) + 0x7ff0;
-	.lit4 ALIGN(128): { *(.lit4) }
-	.lit8 ALIGN(128): { *(.lit8) }
-
-	.sdata ALIGN(128): {
-		*(.sdata)
-		*(.sdata.*)
-		*(.gnu.linkonce.s*)
-	}
-
-	_edata = .;
-	PROVIDE(edata = .);
-
-	/* Uninitialized data.  */
-	.sbss ALIGN(128) : {
-		*(.sbss)
-		*(.sbss.*)
-		*(.gnu.linkonce.sb*)
-		*(.scommon)
-	}
 
 }

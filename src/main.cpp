@@ -8,70 +8,67 @@
 # Review ps2sdk README & LICENSE files for further details.
 */
 
-#include <cstdint>
-#include <ctype.h>
-
-
 /************************************************************************/
 /*							Address Wrappers							*/
 /************************************************************************/
 
-#include "stdwrappers.h"
+#include "wrappers.h"
 
-typedef uint64_t QWORD;
-typedef uint8_t BYTE;
-typedef uint16_t WORD;
-typedef uint32_t DWORD;
-typedef uint64_t QWORD;
-
-typedef int FILE;
+void (*FlushCache)(int) __attribute__((section(".data"))) = (void (*)(int))0x0053BA20;
 
 FILE* (*rw_open)(const char*, const char*) __attribute__((section(".data"))) = (FILE* (*)(const char*, const char*))0x00233210;
 size_t (*rw_read)(FILE *, void *, size_t) __attribute__((section(".data"))) = (size_t (*)(FILE *, void *, size_t))0x00233250;
 int (*rw_seek)(FILE *, long int, int) __attribute__((section(".data"))) = (int (*)(FILE *, long int, int))0x002332B0;
 int (*rw_close)(FILE *) __attribute__((section(".data"))) = (int (*)(FILE *))0x00233370;
 
-int (*printf)(const char *, ...) __attribute__((section(".data")))  = (int (*)(const char *, ...))0x0054F7D0;
+RwFileFunction* (*RwOsGetFileInterface)(void)  __attribute__((section(".data"))) = (RwFileFunction* (*)(void))0x003332B8;
 
+int (*printf)(const char *, ...) __attribute__((section(".data")))  = (int (*)(const char *, ...))0x0054F7D0;
 void* (*malloc)(size_t) __attribute__((section(".data")))  = (void* (*)(size_t))0x00337010;
 void (*free)(void*) __attribute__((section(".data")))  = (void (*)(void*))0x0054D838;
 void* (*memset)(void *, int, size_t) __attribute__((section(".data")))  = (void* (*)(void *, int, size_t))0x0054E568;
 void* (*memcpy)(void *, const void *, size_t) __attribute__((section(".data")))  = (void* (*)(void *, const void *, size_t))0x0054E3B0;
 int (*memcmp)(const void *, const void *, size_t) __attribute__((section(".data")))  = (int (*)(const void *, const void *, size_t))0x0054E318;
-
 size_t (*strlen)(const char *) __attribute__((section(".data")))  = (size_t (*)(const char *))0x005517B8;
 int (*strcmp)(const char *, const char *) __attribute__((section(".data")))  = (int (*)(const char *, const char *))0x00551558;
 char* (*strcpy)(char *, const char *) __attribute__((section(".data")))  = (char* (*)(char *, const char *))0x005516A0;
 char* (*strcat)(char *, const char *) __attribute__((section(".data")))  = (char* (*)(char *, const char *))0x00551298;
+char* (*strncpy)(char *, const char *, size_t) __attribute__((section(".data"))) = (char* (*)(char *, const char *, size_t))0x00551D80;
+int (*sprintf)(char *, const char *, ...) __attribute__((section(".data"))) = (int (*)(char *, const char *, ...))0x00550F10;
+float (*floor)(float) __attribute__((section(".data"))) = (float (*)(float))0x0053AF48;
+float (*pow)(float, float) __attribute__((section(".data"))) = (float (*)(float, float))0x00537468;
+int64_t (*__extendsfdf2)(float) __attribute__((section(".data"))) = (int64_t (*)(float))0x00531140;
+
+int (*sceSifLoadModule)(char*, int, int) __attribute__((section(".data"))) = (int (*)(char*, int, int))0x005449A0;
+void (*loadIOPModules2)(void) __attribute__((section(".data"))) = (void (*)())0x00245D60;
 
 #include "CTheScripts.h"
 
-int  __attribute__((section(".GetPedStruct"))) GetPedStruct(DWORD *a1, int a2) {return 0;}
-DWORD* pedPool __attribute__((section(".pedPool")));
+size_t* CTimer_m_snTimeInMilliseconds  __attribute__((section(".data"))) = (size_t*)0x0066BA14;
+void* CTheScripts_ScriptSpace __attribute__((section(".data"))) = (void*)0x006B1FF0;
+bool* CTheScripts_FailCurrentMission __attribute__((section(".data"))) = (bool*)0x0066B564;
+int* _StyledText_2 __attribute__((section(".data"))) = (int*)0x007C2910;
 
-int  __attribute__((section(".GetVehStruct"))) GetVehStruct(DWORD *a1, int a2) {return 0;}
-DWORD* vehPool __attribute__((section(".vehPool")));
+bool (*CCutsceneMgr_IsCutsceneSkipButtonBeingPressed)() __attribute__((section(".data"))) = (bool (*)())0x00304860;
+void (*CRunningScript_DoDeatharrestCheck)(CRunningScript *) __attribute__((section(".data"))) = (void (*)(CRunningScript *))0x0030A7F0;
+void (*CTheScripts_ReinitialiseSwitchStatementData)()  __attribute__((section(".data")))  = (void (*)())0x005008F0;
 
-int  __attribute__((section(".GetObjStruct"))) GetObjStruct(DWORD *a1, int a2) {return 0;}
-DWORD* objPool __attribute__((section(".objPool")));
-
-void   __attribute__((section(".PrintHelp"))) PrintHelp(char* text, int a, int b, int c){ return; }
-
-bool   __attribute__((section("._ZN12CCutsceneMgr32IsCutsceneSkipButtonBeingPressedEv"))) CCutsceneMgr_IsCutsceneSkipButtonBeingPressed(){ return true; }
-void* CTheScripts_ScriptSpace __attribute__((section("._ZN11CTheScripts11ScriptSpaceE")));
-void  __attribute__((section("._ZN14CRunningScript18DoDeatharrestCheckEv"))) CRunningScript_DoDeatharrestCheck(CRunningScript *thread){ return; }
-bool CTheScripts_FailCurrentMission __attribute__((section("._ZN11CTheScripts18FailCurrentMissionE")));
-size_t CTimer_m_snTimeInMilliseconds __attribute__((section("._ZN6CTimer22m_snTimeInMillisecondsE")));
-void __attribute__((section("._ZN11CTheScripts31ReinitialiseSwitchStatementDataEv"))) CTheScripts_ReinitialiseSwitchStatementData(){ return; }
-int _StyledText_2[2] __attribute__((section(".style2")));
-size_t CTheScripts_CommandsExecuted  __attribute__((section(".CTheScripts_CommandsExecuted")));
-int __attribute__((section(".opcodeTable"))) (*opcodeHandlerTable[100])(CRunningScript* thread, int opcode);
+int (*opcodeHandlerTable)(CRunningScript*, int)  __attribute__((section(".data"))) = (int (*)(CRunningScript*, int))0x5F91C0;
 
 void(*SetScriptCondResult)(CRunningScript *, bool) __attribute__((section(".data"))) = (void(*)(CRunningScript *, bool))0x003077F0;
 
+void (*PrintHelp)(char*, int, int, int) __attribute__((section(".data"))) = (void (*)(char*, int, int, int))0x002A9170;
 void (*PrintBig)(const char *, int, uint16_t) __attribute__((section(".data"))) = (void (*)(const char *, int, uint16_t))0x0018BCD0;
 void (*Print)(const char *src, int, bool, bool) __attribute__((section(".data"))) = (void (*)(const char *src, int, bool, bool))0x0018B570;
 void (*PrintNow)(const char *src, int, bool, bool) __attribute__((section(".data"))) = (void (*)(const char *src, int, bool, bool))0x0018B8B0;
+
+DWORD* pedPool __attribute__((section(".data"))) = (DWORD*)0x0066B918;
+DWORD* vehPool __attribute__((section(".data"))) = (DWORD*)0x0066B91C;
+DWORD* objPool __attribute__((section(".data"))) = (DWORD*)0x0066B924;
+
+int (*GetPedStruct)(DWORD *, int) __attribute__((section(".data"))) = (int (*)(DWORD *, int))0x001FFBB0;
+int (*GetVehStruct)(DWORD *, int) __attribute__((section(".data"))) = (int (*)(DWORD *, int))0x001FFB70;
+int (*GetObjStruct)(DWORD *, int) __attribute__((section(".data"))) = (int (*)(DWORD *, int))0x001FFB30;
 
 int (*GetPedHandle)(DWORD *, int) __attribute__((section(".data"))) = (int (*)(DWORD *, int))0x0019FA20;
 int (*GetVehHandle)(DWORD *, int) __attribute__((section(".data"))) = (int (*)(DWORD *, int))0x0017EF20;
@@ -79,15 +76,21 @@ int (*GetObjHandle)(DWORD *, int) __attribute__((section(".data"))) = (int (*)(D
 
 const char* (*CText_Get)(DWORD, const char*) __attribute__((section(".data"))) = (const char* (*)(DWORD, const char*))0x0018ED90;
 
-DWORD gameTexts __attribute__((section(".data")))  = 0x0069F290;
-char message_buf[0x80];
+DWORD gameTexts __attribute__((section(".data"))) = 0x0069F290;
+
+const char* cdrom0 __attribute__((section(".data"))) = (const char*)0x005FA3E8;
+const char* system_folder __attribute__((section(".data"))) = (const char*)0x00666190;
+const char* CanTLoadModule __attribute__((section(".data"))) = (const char*)0x005FA460;
+const char* Loading_s __attribute__((section(".data"))) = (const char*)0x005FA448;
+
+char message_buf[0x80]  __attribute__((section(".data"))) ;
 
 /************************************************************************/
 /*					CRunningScript::Process hook						*/
 /************************************************************************/
 
-const char act_ptr[] __attribute__((section(".debugtex"))) = "CRunningScript::Proccess - CurrentIP pointer: 0x%x - Opcode: %04x\n";
-
+//const char act_ptr[] __attribute__((section(".debugtex"))) = "CRunningScript::Proccess - CurrentIP pointer: 0x%x - Opcode: %04x\n";
+/*
 int __attribute__((section("._ZN14CRunningScript7ProcessEv"))) CRunningScript_Process(CRunningScript *thread)
 {
 
@@ -116,7 +119,7 @@ int __attribute__((section("._ZN14CRunningScript7ProcessEv"))) CRunningScript_Pr
     }
     if ( thread->bUseMissionCleanup )
         CRunningScript_DoDeatharrestCheck(thread);
-    if ( thread->bIsMission && CTheScripts_FailCurrentMission == 1 )
+    if ( thread->bIsMission && *CTheScripts_FailCurrentMission == 1 )
     {
         v3 = thread->SP == 1;
         if ( thread->SP > 1u )
@@ -135,7 +138,7 @@ int __attribute__((section("._ZN14CRunningScript7ProcessEv"))) CRunningScript_Pr
         }
     }
     CTheScripts_ReinitialiseSwitchStatementData();
-    if ( CTimer_m_snTimeInMilliseconds >= thread->WakeTime )
+    if ( *CTimer_m_snTimeInMilliseconds >= thread->WakeTime )
     {
 		
         do
@@ -170,22 +173,45 @@ int __attribute__((section("._ZN14CRunningScript7ProcessEv"))) CRunningScript_Pr
 	return 0;
 }
 
+*/
+
 
 
 /************************************************************************/
 /*						CRunningScript wrappers							*/
 /************************************************************************/
 
-SCRIPT_VAR opcodeParams[35] __attribute__((section(".opcodeparams")));
+SCRIPT_VAR* opcodeParams __attribute__((section(".data"))) = (SCRIPT_VAR*)0x006FDFB0;
 
-void  __attribute__((section(".setparams"))) SetScriptParams(CRunningScript *thread, int count){ count ++; return; }
-void  __attribute__((section(".getparams"))) GetScriptParams(CRunningScript *thread, int count){ return; }
-void  __attribute__((section(".getstrparam")))  GetScriptStringParam(CRunningScript *thread, char *ptr, uint8_t len){ return; }
-inline SCRIPT_VAR*  __attribute__((section(".getparamptr"))) GetScriptParamPointer(CRunningScript *thread, int count){ return (SCRIPT_VAR*)0xCAFE; }
+void (*SetScriptParams)(CRunningScript *, int) __attribute__((section(".data"))) = (void (*)(CRunningScript *, int))0x001F7D20;
+void (*GetScriptParams)(CRunningScript *, int) __attribute__((section(".data"))) = (void (*)(CRunningScript *, int))0x001F77D0;
+void (*GetScriptStringParam)(CRunningScript *, char *, uint8_t) __attribute__((section(".data"))) = (void (*)(CRunningScript *, char *, uint8_t))0x001F7200;
+SCRIPT_VAR* (*GetScriptParamPointer)(CRunningScript *, int) __attribute__((section(".data"))) = (SCRIPT_VAR* (*)(CRunningScript *, int))0x001F8300;
 
 /************************************************************************/
 /*						CLEO New functions								*/
 /************************************************************************/
+
+
+const char* __attribute__((section(".data")))  usbd = "USBD.IRX";
+const char* __attribute__((section(".data")))  usbhdfsd = "USBHDFSD.IRX";
+
+void LoadUSBIOPModules(){
+	char str_buffer[256];
+
+	loadIOPModules2();
+
+	strcpy(str_buffer, cdrom0);
+    strcat(str_buffer, system_folder);
+    strcat(str_buffer, usbd);
+    printf(Loading_s, str_buffer);
+    while ( sceSifLoadModule(str_buffer, 0, 0) < 0 ) printf(CanTLoadModule, usbd);
+	strcpy(str_buffer, cdrom0);
+    strcat(str_buffer, system_folder);
+    strcat(str_buffer, usbhdfsd);
+    printf(Loading_s, str_buffer);
+    while ( sceSifLoadModule(str_buffer, 0, 0) < 0 ) printf(CanTLoadModule, usbhdfsd);
+}
 
 inline void SkipUnusedParameters(CRunningScript *thread)
 {
@@ -296,11 +322,6 @@ CustomOpcodeHandler customOpcodeHandlers[100] =
 };
 
 typedef OpcodeResult(*_OpcodeHandler)(CRunningScript *thread, unsigned short opcode);
-
-void(* ProcessScript)(CRunningScript*);
-
-
-void(* SpawnCar)(DWORD);
 
 inline  CRunningScript& operator>>(CRunningScript& thread, DWORD& uval)
 {
@@ -417,7 +438,7 @@ char  *readString(CRunningScript *thread, char* buf = nullptr, uint8_t size = 0)
         // process as scm string
         if (!buf)
         {
-            static char result[128]    ;
+            static char result[128] __attribute__((section(".data"))) ;
             memset(result, 0, 128);
             GetScriptStringParam(thread, result, 128);
             return result;
@@ -671,7 +692,7 @@ OpcodeResult   opcode_0A96(CRunningScript *thread)
 {
 	DWORD handle;
 	*thread >> handle;
-	*thread << GetPedStruct(pedPool, handle);
+	*thread << GetPedStruct((DWORD*)*pedPool, handle);
 	return OR_CONTINUE;
 }
 
@@ -680,7 +701,7 @@ OpcodeResult   opcode_0A97(CRunningScript *thread)
 {
 	DWORD handle;
 	*thread >> handle;
-	*thread << GetVehStruct(vehPool, handle);
+	*thread << GetVehStruct((DWORD*)*vehPool, handle);
 	return OR_CONTINUE;
 }
 
@@ -689,7 +710,7 @@ OpcodeResult   opcode_0A98(CRunningScript *thread)
 {
 	DWORD handle;
 	*thread >> handle;
-	*thread << GetObjStruct(objPool, handle);
+	*thread << GetObjStruct((DWORD*)*objPool, handle);
 	return OR_CONTINUE;
 }
 
@@ -726,14 +747,33 @@ OpcodeResult opcode_0A9B(CRunningScript *thread)
 	return OR_CONTINUE;
 }
 
+int CFileMgr_GetFileLength(FILE* a1)
+{
+  RwFileFunction *v1; // eax
+  int v2; // edi
+  RwFileFunction *v3; // eax
+  RwFileFunction *v4; // eax
+  int v5; // ebx
+  RwFileFunction *v6; // eax
+
+  v1 = RwOsGetFileInterface();
+  v2 = v1->rwftell(a1);
+  v3 = RwOsGetFileInterface();
+  v3->rwfseek(a1, 0, 2);
+  v4 = RwOsGetFileInterface();
+  v5 = v4->rwftell(a1);
+  v6 = RwOsGetFileInterface();
+  v6->rwfseek(a1, v2, 0);
+  return v5;
+}
+
 //0A9C=2,%2d% = file %1d% size
 OpcodeResult opcode_0A9C(CRunningScript *thread)
 {
 	
-	//DWORD hFile;
-	//*thread >> hFile;
-	//*thread << file_get_size(hFile);
-	SkipUnusedParameters(thread);
+	DWORD hFile;
+	*thread >> hFile;
+	*thread << CFileMgr_GetFileLength((FILE*)hFile);
 	return OR_CONTINUE;
 }
 
@@ -777,9 +817,9 @@ OpcodeResult opcode_0AA1(CRunningScript *thread)
 	return OR_CONTINUE;
 }
 
-static char textParams[2][128];
-static unsigned char currTextParam   = 0;
-static SCRIPT_VAR arguments[15] = { 0 };
+static char  __attribute__((section(".data"))) textParams[2][128];
+static unsigned char  __attribute__((section(".data"))) currTextParam  = 0;
+static SCRIPT_VAR  __attribute__((section(".data"))) arguments[15] = { 0 };
 
 //0AA5=-1,call_function %1d% num_params %2h% pop %3h%
 OpcodeResult opcode_0AA5(CRunningScript *thread)
