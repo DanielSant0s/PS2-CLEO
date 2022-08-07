@@ -413,17 +413,58 @@ OpcodeResult opcode_defa(CRunningScript *thread)
 //0A8C=3,write_memory %1d% size %2d% value %3d%
 OpcodeResult opcode_0A8C(CRunningScript *thread)
 {
-	GetScriptParams(thread, 3);
+	GetScriptParams(thread, 4);
 	DWORD *Address = (DWORD*)opcodeParams[0].pParam;
 	DWORD size = opcodeParams[1].dwParam;
+	uint32_t align_diff;
+	DWORD aligned_addr;
+	DWORD temp[2];
+	BYTE bytes[8];
 
 	switch(size){
 	default:
-		*Address = opcodeParams[2].ucParam;
+		align_diff = (DWORD)Address % 4;
+
+		if(align_diff > 0){
+			aligned_addr = (DWORD)Address;
+			aligned_addr = ((DWORD)aligned_addr - align_diff);
+			temp[0] = *(DWORD*)(aligned_addr);
+
+			bytes[0] = temp[0] & 0xFF; bytes[1] = (temp[0] >> 8) & 0xFF; bytes[2] = (temp[0] >> 16) & 0xFF; bytes[3] = (temp[0] >> 24) & 0xFF;
+
+			bytes[align_diff] = opcodeParams[2].ucParam;
+
+			*(DWORD*)aligned_addr =  bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24);
+		} else {
+			*Address = opcodeParams[2].ucParam;
+		}
+
 		break;
+
 	case 2:
-		*Address = opcodeParams[2].wParam;
+		align_diff = (DWORD)Address % 4;
+
+		if(align_diff > 0){
+			aligned_addr = (DWORD)Address;
+			aligned_addr = ((DWORD)aligned_addr - align_diff);
+			temp[0] = *(DWORD*)(aligned_addr);
+			temp[1] = *(DWORD*)(aligned_addr+4);
+
+			bytes[0] = temp[0] & 0xFF; bytes[1] = (temp[0] >> 8) & 0xFF; bytes[2] = (temp[0] >> 16) & 0xFF; bytes[3] = (temp[0] >> 24) & 0xFF;
+
+			if(align_diff > 2) bytes[4] = temp[1] & 0xFF; bytes[5] = (temp[1] >> 8) & 0xFF; bytes[6] = (temp[2] >> 16) & 0xFF; bytes[7] = (temp[1] >> 24) & 0xFF;
+
+			bytes[align_diff] = opcodeParams[2].ucParam & 0xFF; bytes[align_diff+1] = (opcodeParams[2].ucParam >> 8) & 0xFF;
+
+			*(DWORD*)aligned_addr =  bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24);
+			if(align_diff > 2) *(DWORD*)(aligned_addr+4) =  bytes[4] | (bytes[5] << 8) | (bytes[6] << 16) | (bytes[7] << 24);
+
+		} else {
+			*Address = opcodeParams[2].wParam;
+		}
+		
 		break;
+
 	case 4:
 		*Address = opcodeParams[2].dwParam;
 		break;
@@ -436,15 +477,37 @@ OpcodeResult   opcode_0A8D(CRunningScript *thread)
 {
 	DWORD *Address;
 	DWORD size;
+	uint32_t align_diff;
+	DWORD aligned_addr;
 
 	*thread >> Address >> size;
 
+	GetScriptParams(thread, 1);
+
 	switch(size){
 	default:
-		opcodeParams[0].ucParam = *(uint8_t*)Address;
+		align_diff = (DWORD)Address % 4;
+		aligned_addr = (DWORD)Address;
+
+		if(align_diff > 0){
+			aligned_addr = ((DWORD)aligned_addr - align_diff);
+			opcodeParams[0].ucParam = (BYTE)(*(uint32_t*)(aligned_addr) >> (8*align_diff));
+		} else {
+			opcodeParams[0].ucParam = *(BYTE*)Address;
+		}
 		break;
 	case 2:
-		opcodeParams[0].wParam = *(uint16_t*)Address;
+		align_diff = (DWORD)Address % 4;
+		aligned_addr = (DWORD)Address;
+
+		if(align_diff > 0){
+			aligned_addr = ((DWORD)aligned_addr - align_diff);
+			opcodeParams[0].wParam = (WORD)(*(uint32_t*)(aligned_addr) >> (8*align_diff));
+			opcodeParams[0].wParam += (WORD)(*(uint32_t*)(aligned_addr+4) << (8*(4-align_diff)));
+		} else {
+			opcodeParams[0].wParam = *(WORD*)Address;
+		}
+
 		break;
 	case 4:
 		opcodeParams[0].dwParam = *Address;
@@ -536,7 +599,7 @@ OpcodeResult opcode_0A9A(CRunningScript *thread)
 	}
 	else
 	{
-		*thread << NULL;
+		*thread << (DWORD)NULL;
 		SetScriptCondResult(thread, false);
 	}
 	return OR_CONTINUE;
@@ -649,51 +712,96 @@ OpcodeResult opcode_0AA5(CRunningScript *thread)
 				*thread >> arg->fParam;
 				switch(i)
 				{
-					case 0:
-						__asm__ ("lwc1 $f12, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 1:  
-						__asm__ ("lwc1 $f13, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 2:  
-						__asm__ ("lwc1 $f14, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 3:  
-						__asm__ ("lwc1 $f15, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 4:  
-						__asm__ ("lwc1 $f16, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 5:  
-						__asm__ ("lwc1 $f17, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 6:  
-						__asm__ ("lwc1 $f18, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 7: 
-						__asm__ ("lwc1 $f19, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 8:  
-						__asm__ ("lwc1 $f20, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 9:  
-						__asm__ ("lwc1 $f21, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 10: 
-						__asm__ ("lwc1 $f22, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 11: 
-						__asm__ ("lwc1 $f23, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 12: 
-						__asm__ ("lwc1 $f24, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 13: 
-						__asm__ ("lwc1 $f25, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 14: 
-						__asm__ ("lwc1 $f26, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
+				case 0:
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f12, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 1:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f13, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 2:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f14, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 3:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f15, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 4:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f16, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 5:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f17, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 6:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f18, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 7: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f19, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 8:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f20, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 9:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f21, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 10: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f22, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 11: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f23, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 12: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f24, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 13: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f25, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 14: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f26, $f0 \n" : : "r" (arg->fParam));
+					break;
 				}
 				i++;
 				break;
@@ -754,51 +862,96 @@ OpcodeResult opcode_0AA6(CRunningScript *thread)
 				*thread >> arg->fParam;
 				switch(i)
 				{
-					case 0:
-						__asm__ ("lwc1 $f12, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 1:  
-						__asm__ ("lwc1 $f13, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 2:  
-						__asm__ ("lwc1 $f14, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 3:  
-						__asm__ ("lwc1 $f15, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 4:  
-						__asm__ ("lwc1 $f16, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 5:  
-						__asm__ ("lwc1 $f17, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 6:  
-						__asm__ ("lwc1 $f18, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 7: 
-						__asm__ ("lwc1 $f19, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 8:  
-						__asm__ ("lwc1 $f20, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 9:  
-						__asm__ ("lwc1 $f21, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 10: 
-						__asm__ ("lwc1 $f22, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 11: 
-						__asm__ ("lwc1 $f23, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 12: 
-						__asm__ ("lwc1 $f24, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 13: 
-						__asm__ ("lwc1 $f25, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 14: 
-						__asm__ ("lwc1 $f26, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
+				case 0:
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f12, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 1:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f13, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 2:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f14, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 3:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f15, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 4:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f16, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 5:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f17, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 6:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f18, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 7: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f19, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 8:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f20, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 9:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f21, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 10: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f22, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 11: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f23, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 12: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f24, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 13: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f25, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 14: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f26, $f0 \n" : : "r" (arg->fParam));
+					break;
 				}
 				i++;
 				break;
@@ -856,51 +1009,96 @@ OpcodeResult opcode_0AA7(CRunningScript *thread)
 				*thread >> arg->fParam;
 				switch(i)
 				{
-					case 0:
-						__asm__ ("lwc1 $f12, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 1:  
-						__asm__ ("lwc1 $f13, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 2:  
-						__asm__ ("lwc1 $f14, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 3:  
-						__asm__ ("lwc1 $f15, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 4:  
-						__asm__ ("lwc1 $f16, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 5:  
-						__asm__ ("lwc1 $f17, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 6:  
-						__asm__ ("lwc1 $f18, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 7: 
-						__asm__ ("lwc1 $f19, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 8:  
-						__asm__ ("lwc1 $f20, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 9:  
-						__asm__ ("lwc1 $f21, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 10: 
-						__asm__ ("lwc1 $f22, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 11: 
-						__asm__ ("lwc1 $f23, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 12: 
-						__asm__ ("lwc1 $f24, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 13: 
-						__asm__ ("lwc1 $f25, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
-					case 14: 
-						__asm__ ("lwc1 $f26, 0(%0) \n" : : "r" (&arg->fParam));
-						break;
+				case 0:
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f12, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 1:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f13, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 2:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f14, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 3:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f15, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 4:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f16, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 5:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f17, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 6:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f18, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 7: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f19, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 8:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f20, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 9:  
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f21, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 10: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f22, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 11: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f23, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 12: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f24, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 13: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f25, $f0 \n" : : "r" (arg->fParam));
+					break;
+				case 14: 
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f26, $f0 \n" : : "r" (arg->fParam));
+					break;
 				}
 				i++;
 				break;
@@ -964,49 +1162,94 @@ OpcodeResult opcode_0AA8(CRunningScript *thread)
 			switch(i)
 			{
 				case 0:
-					__asm__ ("lwc1 $f12, 0(%0) \n" : : "r" (&arg->fParam));
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f12, $f0 \n" : : "r" (arg->fParam));
 					break;
 				case 1:  
-					__asm__ ("lwc1 $f13, 0(%0) \n" : : "r" (&arg->fParam));
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f13, $f0 \n" : : "r" (arg->fParam));
 					break;
 				case 2:  
-					__asm__ ("lwc1 $f14, 0(%0) \n" : : "r" (&arg->fParam));
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f14, $f0 \n" : : "r" (arg->fParam));
 					break;
 				case 3:  
-					__asm__ ("lwc1 $f15, 0(%0) \n" : : "r" (&arg->fParam));
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f15, $f0 \n" : : "r" (arg->fParam));
 					break;
 				case 4:  
-					__asm__ ("lwc1 $f16, 0(%0) \n" : : "r" (&arg->fParam));
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f16, $f0 \n" : : "r" (arg->fParam));
 					break;
 				case 5:  
-					__asm__ ("lwc1 $f17, 0(%0) \n" : : "r" (&arg->fParam));
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f17, $f0 \n" : : "r" (arg->fParam));
 					break;
 				case 6:  
-					__asm__ ("lwc1 $f18, 0(%0) \n" : : "r" (&arg->fParam));
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f18, $f0 \n" : : "r" (arg->fParam));
 					break;
 				case 7: 
-					__asm__ ("lwc1 $f19, 0(%0) \n" : : "r" (&arg->fParam));
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f19, $f0 \n" : : "r" (arg->fParam));
 					break;
 				case 8:  
-					__asm__ ("lwc1 $f20, 0(%0) \n" : : "r" (&arg->fParam));
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f20, $f0 \n" : : "r" (arg->fParam));
 					break;
 				case 9:  
-					__asm__ ("lwc1 $f21, 0(%0) \n" : : "r" (&arg->fParam));
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f21, $f0 \n" : : "r" (arg->fParam));
 					break;
 				case 10: 
-					__asm__ ("lwc1 $f22, 0(%0) \n" : : "r" (&arg->fParam));
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f22, $f0 \n" : : "r" (arg->fParam));
 					break;
 				case 11: 
-					__asm__ ("lwc1 $f23, 0(%0) \n" : : "r" (&arg->fParam));
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f23, $f0 \n" : : "r" (arg->fParam));
 					break;
 				case 12: 
-					__asm__ ("lwc1 $f24, 0(%0) \n" : : "r" (&arg->fParam));
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f24, $f0 \n" : : "r" (arg->fParam));
 					break;
 				case 13: 
-					__asm__ ("lwc1 $f25, 0(%0) \n" : : "r" (&arg->fParam));
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f25, $f0 \n" : : "r" (arg->fParam));
 					break;
 				case 14: 
-					__asm__ ("lwc1 $f26, 0(%0) \n" : : "r" (&arg->fParam));
+					__asm__ ("mtc1    %0, $f0   \n"
+							 "nop				\n"	
+							 "cvt.s.w $f0, $f0	\n"
+							 "mov.s   $f26, $f0 \n" : : "r" (arg->fParam));
 					break;
 			}
 			i++;

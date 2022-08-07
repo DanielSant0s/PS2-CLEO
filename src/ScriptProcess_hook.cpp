@@ -1,7 +1,5 @@
 #include "wrappers.h"
 
-//const char act_ptr[] __attribute__((section(".debugtex"))) = "CRunningScript::Proccess - CurrentIP pointer: 0x%x - Opcode: %04x\n";
-
 int CRunningScript_Process(CRunningScript *thread)
 {
 
@@ -13,8 +11,8 @@ int CRunningScript_Process(CRunningScript *thread)
     void *v2; // eax
     bool v3; // zf
     WORD v4; // ax
-    BYTE *v5; // ecx
-    WORD opcode; // eax
+    BYTE *scriptPC;
+    WORD opcode;
 	int* CommandsExecuted = (int*)0x66B53C;
 
     if ( thread->SceneSkipIP && CCutsceneMgr_IsCutsceneSkipButtonBeingPressed() )
@@ -55,25 +53,25 @@ int CRunningScript_Process(CRunningScript *thread)
         do
         {
 			++*CommandsExecuted;
-            v5 = thread->CurrentIP;
+            scriptPC = thread->CurrentIP;
 
-			uint32_t align_diff = (DWORD)v5 % 4;
-			DWORD aligned_addr = (DWORD)v5;
+			uint32_t align_diff = (DWORD)scriptPC % 4;
+			DWORD aligned_addr = (DWORD)scriptPC;
 
 			if(align_diff > 0){
 				aligned_addr = ((DWORD)aligned_addr - align_diff);
 				opcode = (WORD)(*(uint32_t*)(aligned_addr) >> (8*align_diff));
 				opcode += (WORD)(*(uint32_t*)(aligned_addr+4) << (8*(4-align_diff)));
 			} else {
-				opcode = *(WORD*)v5;
+				opcode = *(WORD*)scriptPC;
 			}
 
-			//printf(act_ptr, v5, opcode);
+			//printf("CRunningScript::Proccess - CurrentIP pointer: 0x%x - Opcode: %04x\n", scriptPC, opcode);
 
-            thread->CurrentIP = (BYTE*)(v5 + 2);
+            thread->CurrentIP = (BYTE*)(scriptPC + 2);
             thread->NotFlag = (opcode & 0x8000) != 0;
         }
-        while ( !opcodeHandlerTable[opcode / 100](thread, opcode) );
+        while ( !opcodeHandlerTable[((opcode & 0x7FFF) / 100)](thread, (opcode & 0x7FFF)) );
     }
 
 	asm __volatile__ (

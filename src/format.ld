@@ -26,6 +26,13 @@ SECTIONS {
 		*(.gcc_except_table)
 	}
 
+	.entry ALIGN(128): {
+		*(.entry)
+		*(.entry.*)
+	}
+
 	_gp = ALIGN(128) + 0x7ff0;
+
+	/DISCARD/ : { *(.reginfo) *(.MIPS.abiflags) }
 
 }

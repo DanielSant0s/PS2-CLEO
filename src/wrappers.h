@@ -35,6 +35,10 @@ extern FILE* (*rw_open)(const char*, const char*) __attribute__((section(".data"
 extern size_t (*rw_read)(FILE *, void *, size_t) __attribute__((section(".data")));
 extern int (*rw_seek)(FILE *, long int, int) __attribute__((section(".data")));
 extern int (*rw_close)(FILE *) __attribute__((section(".data")));
+extern char* (*loadLine)(FILE *) __attribute__((section(".data")));
+extern int (*setDirectory)(const char *) __attribute__((section(".data")));
+
+
 extern int (*printf)(const char *, ...) __attribute__((section(".data")));
 
 extern void* (*malloc)(size_t) __attribute__((section(".data")));
@@ -68,7 +72,7 @@ extern bool (*CCutsceneMgr_IsCutsceneSkipButtonBeingPressed)() __attribute__((se
 extern void (*CRunningScript_DoDeatharrestCheck)(CRunningScript *) __attribute__((section(".data")));
 extern void (*CTheScripts_ReinitialiseSwitchStatementData)()  __attribute__((section(".data")));
 
-extern int (*opcodeHandlerTable)(CRunningScript*, int)  __attribute__((section(".data")));
+extern int (**opcodeHandlerTable)(CRunningScript*, int)  __attribute__((section(".data")));
 
 extern SCRIPT_VAR* opcodeParams __attribute__((section(".data")));
 extern void (*SetScriptParams)(CRunningScript *, int) __attribute__((section(".data")));
