@@ -3,7 +3,7 @@ from utils import FileEx
 
 ref_str = "patch=0,EE,20"
 
-new_address = 0x5F91C0
+new_address = 0x357880
 
 with io.open("pnach.txt", mode="r") as src:
     exsrc = FileEx(src)

@@ -560,7 +560,9 @@ OpcodeResult   opcode_0A96(CRunningScript *thread)
 {
 	DWORD handle;
 	*thread >> handle;
-	*thread << GetPedStruct((DWORD*)*pedPool, handle);
+
+	opcodeParams[0].pParam = GetPedStruct(*pedPool, handle);
+	SetScriptParams(thread, 1);
 	return OR_CONTINUE;
 }
 
@@ -1277,11 +1279,14 @@ OpcodeResult opcode_0AA8(CRunningScript *thread)
 
 	DWORD result;
 
-	result =  func(struc, arguments[0], arguments[1],  arguments[2],  arguments[3], arguments[4], 
+	result = func(struc, arguments[0], arguments[1],  arguments[2],  arguments[3], arguments[4], 
 		 			arguments[5], arguments[6], arguments[7], arguments[8], arguments[9], 
 		 			arguments[10], arguments[11], arguments[12], arguments[13], arguments[14]);
 
 	*thread << result;
+
+	SkipUnusedParameters(thread);
+
 	return OR_CONTINUE;
 }
 
@@ -1462,7 +1467,7 @@ OpcodeResult opcode_0AEA(CRunningScript *thread)
 {
 	DWORD struc;
 	*thread >> struc;
-	*thread << GetPedHandle(pedPool, struc);
+	*thread << GetPedHandle(*pedPool, struc);
 	return OR_CONTINUE;
 }
 
@@ -1471,7 +1476,7 @@ OpcodeResult opcode_0AEB(CRunningScript *thread)
 {
 	DWORD struc;
 	*thread >> struc;
-	*thread << GetVehHandle(vehPool, struc);
+	*thread << GetVehHandle(*vehPool, struc);
 	return OR_CONTINUE;
 }
 
@@ -1480,6 +1485,72 @@ OpcodeResult opcode_0AEC(CRunningScript *thread)
 {
 	DWORD struc;
 	*thread >> struc;
-	*thread << GetObjHandle(objPool, struc);
+	*thread << GetObjHandle(*objPool, struc);
 	return OR_CONTINUE;
 }
+/*
+struct CleoSafeHeader
+{
+    const static unsigned sign;
+    unsigned signature;
+    unsigned n_saved_threads;
+    unsigned n_stopped_threads;
+};
+
+void AddScriptToQueue(CRunningScript *cs, CRunningScript **queue)
+{
+  cs->Next = *queue;
+  cs->Previous = 0;
+  if ( *queue )
+    (*queue)->Previous = cs;
+  *queue = cs;
+}
+
+CRunningScript **activeThreadQueue = (CRunningScript**)0x0066B508;
+
+void CCustomScripts_Init(){
+	struct sce_dirent dirbuf;
+    char* section_names = NULL;
+    const char* plugin_dir = "mass:PS2_SA/cleo/";
+    char* dest_file = NULL;
+
+    int dirfd = sceDopen(plugin_dir);
+
+    sceDread(dirfd, &dirbuf);
+    sceDread(dirfd, &dirbuf);
+
+    while (sceDread(dirfd, &dirbuf) > 0){
+        dest_file = (char*)malloc(strlen(plugin_dir) + strlen(dirbuf.d_name) + 1);
+
+        strcpy(dest_file, plugin_dir);
+        strcat(dest_file, dirbuf.d_name);
+ 
+        int file = open(dest_file, 1);
+
+    	size_t file_size = lseek(file, 0, SEEK_END);
+    	lseek(file, 0, SEEK_SET);
+
+    	BYTE* file_data = (BYTE*)malloc(file_size);
+
+    	read(file, file_data, file_size);
+
+		close(file);
+
+		CRunningScript* cs = static_cast<CRunningScript*>(malloc(sizeof(CRunningScript)));
+		*cs = CRunningScript();
+
+		cs->BaseIP = cs->CurrentIP = file_data;
+
+		memcpy(cs->Name, dirbuf.d_name, sizeof(cs->Name));
+		cs->Name[7] = '\0';
+
+        free(dest_file);
+
+	    AddScriptToQueue(cs, activeThreadQueue);
+        cs->SetActive(true);
+
+    }
+
+}
+
+*/

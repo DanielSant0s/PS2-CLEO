@@ -2,3 +2,11 @@
 *.pyc
 *.elf
 *.dep
+tools/ida.txt
+tools/pnach.txt
+tools/slided_pnach.txt
+tools/pnach.txt
+*.o
+tools/pnach.txt
+*.txt
+tools/pnach.txt

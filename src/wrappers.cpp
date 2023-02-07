@@ -12,9 +12,26 @@ int (*setDirectory)(const char *) = (int (*)(const char *))0x002330B0;
 
 RwFileFunction* (*RwOsGetFileInterface)(void)  = (RwFileFunction* (*)(void))0x003332B8;
 
+
+int (*open)(const char *pathname, int flags) = (int (*)(const char *, int))0x00540B28;
+int (*close)(int fd) = (int (*)(int))0x00540DB8;
+size_t (*lseek)(int fd, size_t offset, int whence) = (size_t (*)(int, size_t, int))0x00540F30;
+size_t (*read)(int fd, void *buf, size_t count) = (size_t (*)(int, void *, size_t))0x00541170;
+size_t (*write)(int fd, const void *buf, size_t count) = (size_t (*)(int, const void *, size_t))0x005413E0;
+int (*chdir)(const char *name) = (int (*)(const char *))0x00542D20;
+
+int (*sceDopen)(const char *dirname) = (int (*)(const char *))0x00542388;
+int (*sceDclose)(int fd) = (int (*)(int))0x00542450;
+int (*sceDread)(int fd, struct sce_dirent *buf) = (int (*)(int, struct sce_dirent *))0x005425B8;
+int (*sceRemove)(const char *filename) = (int (*)(const char *))0x00542B18;
+int (*sceMkdir)(const char *dirname, int flag) = (int (*)(const char *, int))0x00541DE0;
+int (*sceRmdir)(const char *dirname) = (int (*)(const char *))0x00541F98;
+
+
+
 int (*printf)(const char *, ...)  = (int (*)(const char *, ...))0x0054F7D0;
-void* (*malloc)(size_t)  = (void* (*)(size_t))0x00337010;
-void (*free)(void*)  = (void (*)(void*))0x0054D838;
+void* (*malloc)(size_t)  = (void* (*)(size_t))0x001005E0;
+void (*free)(void*)  = (void (*)(void*))0x00100780;
 void* (*memset)(void *, int, size_t)  = (void* (*)(void *, int, size_t))0x0054E568;
 void* (*memcpy)(void *, const void *, size_t)  = (void* (*)(void *, const void *, size_t))0x0054E3B0;
 int (*memcmp)(const void *, const void *, size_t)  = (int (*)(const void *, const void *, size_t))0x0054E318;
@@ -56,13 +73,13 @@ void (*PrintBig)(const char *, int, uint16_t) = (void (*)(const char *, int, uin
 void (*Print)(const char *src, int, bool, bool) = (void (*)(const char *src, int, bool, bool))0x0018B570;
 void (*PrintNow)(const char *src, int, bool, bool) = (void (*)(const char *src, int, bool, bool))0x0018B8B0;
 
-DWORD* pedPool = (DWORD*)0x0066B918;
-DWORD* vehPool = (DWORD*)0x0066B91C;
-DWORD* objPool = (DWORD*)0x0066B924;
+DWORD** pedPool = (DWORD**)0x0066B918;
+DWORD** vehPool = (DWORD**)0x0066B91C;
+DWORD** objPool = (DWORD**)0x0066B924;
 
-int (*GetPedStruct)(DWORD *, int) = (int (*)(DWORD *, int))0x001FFBB0;
-int (*GetVehStruct)(DWORD *, int) = (int (*)(DWORD *, int))0x001FFB70;
-int (*GetObjStruct)(DWORD *, int) = (int (*)(DWORD *, int))0x001FFB30;
+DWORD* (*GetPedStruct)(DWORD *, int) = (DWORD* (*)(DWORD *, int))0x001FFBB0;
+DWORD* (*GetVehStruct)(DWORD *, int) = (DWORD* (*)(DWORD *, int))0x001FFB70;
+DWORD* (*GetObjStruct)(DWORD *, int) = (DWORD* (*)(DWORD *, int))0x001FFB30;
 
 int (*GetPedHandle)(DWORD *, int) = (int (*)(DWORD *, int))0x0019FA20;
 int (*GetVehHandle)(DWORD *, int) = (int (*)(DWORD *, int))0x0017EF20;

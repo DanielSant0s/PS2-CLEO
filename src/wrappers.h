@@ -13,6 +13,8 @@ typedef uint64_t QWORD;
 
 typedef int FILE;
 
+#define O_RDONLY 0x0001
+
 typedef struct RwFileFunction{
 	int padding;  
 	FILE* (*rwfopen)(const char*, const char*);
@@ -38,6 +40,38 @@ extern int (*rw_close)(FILE *) __attribute__((section(".data")));
 extern char* (*loadLine)(FILE *) __attribute__((section(".data")));
 extern int (*setDirectory)(const char *) __attribute__((section(".data")));
 
+
+struct sce_stat {
+        unsigned int    st_mode;       
+                                    
+        unsigned int    st_attr;       
+        unsigned int    st_size;       
+        unsigned char   st_ctime[8];   
+        unsigned char   st_atime[8];   
+        unsigned char   st_mtime[8];   
+        unsigned int    st_hisize;     
+        unsigned int    st_private[6]; 
+};
+
+struct sce_dirent {
+        struct sce_stat d_stat; 
+        char d_name[256];       
+        void    *d_private;     
+};
+
+extern int (*open)(const char *pathname, int flags) __attribute__((section(".data")));
+extern int (*close)(int fd) __attribute__((section(".data")));
+extern size_t (*lseek)(int fd, size_t offset, int whence) __attribute__((section(".data")));
+extern size_t (*read)(int fd, void *buf, size_t count) __attribute__((section(".data")));
+extern size_t (*write)(int fd, const void *buf, size_t count) __attribute__((section(".data")));
+extern int (*chdir)(const char *name) __attribute__((section(".data")));
+
+extern int (*sceDopen)(const char *dirname) __attribute__((section(".data")));
+extern int (*sceDclose)(int fd) __attribute__((section(".data")));
+extern int (*sceDread)(int fd, struct sce_dirent *buf) __attribute__((section(".data")));
+extern int (*sceRemove)(const char *filename) __attribute__((section(".data")));
+extern int (*sceMkdir)(const char *dirname, int flag) __attribute__((section(".data")));
+extern int (*sceRmdir)(const char *dirname) __attribute__((section(".data")));
 
 extern int (*printf)(const char *, ...) __attribute__((section(".data")));
 
@@ -87,13 +121,13 @@ extern void (*PrintBig)(const char *, int, uint16_t) __attribute__((section(".da
 extern void (*Print)(const char *src, int, bool, bool) __attribute__((section(".data")));
 extern void (*PrintNow)(const char *src, int, bool, bool) __attribute__((section(".data")));
 
-extern DWORD* pedPool __attribute__((section(".data")));
-extern DWORD* vehPool __attribute__((section(".data")));
-extern DWORD* objPool __attribute__((section(".data")));
+extern DWORD** pedPool __attribute__((section(".data")));
+extern DWORD** vehPool __attribute__((section(".data")));
+extern DWORD** objPool __attribute__((section(".data")));
 
-extern int (*GetPedStruct)(DWORD *, int) __attribute__((section(".data")));
-extern int (*GetVehStruct)(DWORD *, int) __attribute__((section(".data")));
-extern int (*GetObjStruct)(DWORD *, int) __attribute__((section(".data")));
+extern DWORD* (*GetPedStruct)(DWORD *, int) __attribute__((section(".data")));
+extern DWORD* (*GetVehStruct)(DWORD *, int) __attribute__((section(".data")));
+extern DWORD* (*GetObjStruct)(DWORD *, int) __attribute__((section(".data")));
 
 extern int (*GetPedHandle)(DWORD *, int) __attribute__((section(".data")));
 extern int (*GetVehHandle)(DWORD *, int) __attribute__((section(".data")));
